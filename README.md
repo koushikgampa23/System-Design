@@ -326,3 +326,51 @@ This Repo contains system design
     API acceleration and edge computing(CDN for API's)
         Reduce api response times
         Edge caching for frequently accessed endpoints
+
+## Protocals
+    TCP and UDP:
+        TCP(Transmission Controlled Protocal):
+            Connection oriented protocal
+            Reliable, ordered and error checked communications
+            Ensures data reaches the destination correctly
+        
+            TCP uses three way handshake 
+            This setup introduces small amount of latency, but it creates foundation of reliable communication
+            It doesnot just data it tracks it too, every segment is numbered, acknowledgments are exchanged and missing data is automatically retried.
+            Even if the packets choose different network paths, when it arrives in wrong order, TCP reassembles them in the correct order before passing to application
+            This reliabilty is essential for workloads where correctness matters over raw speed
+            TCP gurantees what was sent is what was arrived
+            The tradeoff is additional overhead, connection establishment, acknowledgement, retransmission and ordering, all this things consumes times and resources.
+            
+            Example: Transfering money, downloading files
+        
+        UDP(User Datagram protocol):
+            Connection less protocal
+            Faster but no delivery gurantees
+            No retransmission of lost packets
+
+            It is designed to 
+            Instead of maximazing reliability, it minimizes communcation overhead and latency
+            It assumes getting data more quickly more important than guranted data
+            There is no handshake, no ongoing tracking of data
+            An application can simply send packets and move on this makes the udp lightweight and efficient
+
+            Example: video calls, online games
+        
+### TCP Vs UDP
+    Feature                 TCP                                                             UDP
+    Reliability         Reliable(ensures data security)                                     Unreliable(no gurante of delivery)
+    Speed               Slower(due to error checking and retransmission)                    Faster(no retransmission overhead)
+    Connection type     Connection-oriented(establishes connection before communication)    Connectionless(sends data without setup)
+    ordering            Ensures packets arrive in order                                     No gurantee of packet order
+    Error handling      Built in error checking and retransmission                          Minimal error checking, no retransmission
+    Overhead            High(due to handshake, sequencing, and acknowledgments)             Low(minimal protocal overhead)
+    Use cases           File transfer, Database communication,web browsing                  Video streaming(Youtube, netflix, zoom)
+
+### HTTP protocal
+    It is the backbone of the web
+    HTTP - HyperText Transfer Protocal
+    The foundation of web application
+    Defines rules for requesting and tranfering resources(eg: webpages, API, images)
+    Works over TCP/IP(Port 80 for HTTP, Port 443 for HTTPS)
+    
