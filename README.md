@@ -373,4 +373,54 @@ This Repo contains system design
     The foundation of web application
     Defines rules for requesting and tranfering resources(eg: webpages, API, images)
     Works over TCP/IP(Port 80 for HTTP, Port 443 for HTTPS)
+
+    Key features:
+        HTTP is stateless each request arrives independently with no built in memory 
+        Text based protocal (easy to read and debug)
+        Supports multiple methods(GET, POST, etc..)
+    
+    Components of HTTP request:
+        Method: Defines the action(GET, POST, etc.)
+        URL: The resource being requested
+        Headers: Metadata(eg: user-agent, content type)
+        Body(optional): Data sent in POST/PUT requests
+    Componenets of HTTP response:
+        Status Code: Indicates success or failure (eg 200, 404 not found)
+        Headers: Metadata about response
+        Body(optional): The actual content returned
+    Request/Reponse life cycle:
+        The browser sends a request
+        The webserver processes the request
+        The server generates a response and sends it back
+        The browser renders the response
+    
+    Stateless nature of http:
+        Http doesnot retain memory of previous request
+        Each request is treated as independent transcation
+        Challenges of stateless:
+            its hard to maintain user sessions
+            Each request must carry all necessary information
+        How do you handle state?
+            cookies - small pieces of data stored in browser
+            sessions - server side storage of user state
+            Tokens - used for authentication and authorization
+    HTTP methods:
+        GET- Retrive a resourse
+        POST- Create a resourse
+        PUT- Update a exisiting resource
+        PATCH- Partially update a resource
+        DELETE- Delete a resource
+    
+    HTTPS:
+        HTTPS is the secure version of HTTP, using SSL/TLS encryption
+        It ensures data confidentiality, integrity and authentication
+        Used for secure webites, online banking and e-commerce
+        works on port 443 instead of 80
+
+        HTTPS provides 3 essential guarentes:
+            Confidentialty ensures that only the intended parties can read the data
+            Integrity protects against tampering while data is in transit
+            Authentication verfies that users can actually communicating with the legtimate website or API and not an attacker impersonating it
+
+### Rest and RestFulnes - API Design Priciples
     
