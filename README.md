@@ -423,4 +423,139 @@ This Repo contains system design
             Authentication verfies that users can actually communicating with the legtimate website or API and not an attacker impersonating it
 
 ### Rest and RestFulnes - API Design Priciples
+    Rest:
+        Defination: REST(Respresentational State Transfer) is an architectural style for designing network applications
+        Key idea: Uses standard HTTP method and stateless communication
+    Why rest matters?
+        Simpilicity and scalability: Based on standard HTTP
+        Interoperability: Works across different platforms
+        Efficiency: Uses caches, stateless for performance
+    REST Constraints(Core Principles)
+        Client server architecture
+        Stateless
+        Cacheability
+        Layered System
+        Uniform interface
+    RESTful API Design priciples
+        Resource Based approach
+            Get /users/{id} to retrive a user
+            Post /orders to create a new order
+        Proper HTTP methods usages:
+            GET- Retrive a resourse
+            POST- Create a resourse
+            PUT- Update a exisiting resource
+            PATCH- Partially update a resource
+            DELETE- Delete a resource
+        Stateless Interactions
+        Consistance in URL structure
+            use plural nouns for collections: /users, /orders
+            Avoid including actions in url: users/{id}/activate -> /users/{id} with PATCH
+            Implement versioning for backend compactability: /v1/users    
+        Resources and endpoints
+            Resources: Entites like users, orders, products
+            Endpoint Examples: Get /users/{id}, POST /orders, delete /users/{1}
+        JSON vs XML in REST apis
+            why json?
+                lightweight
+                Faster parsing
+                Readable
+            when to use xml?
+                Legacy system
+                Data validation needs
+### Real time communication protocal
+    Real time communication refers to the continous exchange of data with minimal latency.
+    why realtime is important(instant chat, live stock updates)
+    Challenges of tranditional request-response HTTP model.
+    Alternatives to improve real time data exchange:
+        pooling
+        websockets
+        Server sent events
+        long pooling
+
+    Websockets: Persistant full duplex communication
+    Defination: Websockets provide a persistant, full duplex communication between client and server over a single tcp connection
+    How they work?
+        Websockets handshake using HTTP upgrade request
+            Step1: Client request an upgrade to websockets
+            Step2: Server accepts and keep open the request
+        Connection remains open for continous data exchange
+            Step3: Data is exchanged in realtime using frames
+            Step4: Either party can close the connection when done
+        This reduces latency and network overhead
+    Advantages:
+        persistant connection = lower latency
+        Reduces overhead compared to http pooling
+        Essential for real time applications
     
+    HTTP requests are designed to retrive information, while websockets are optimized for continous conversation
+
+### Long Pooling: Simulating realtime with HTTP
+    A technique where a client send a request to the server and waits until the server has new data to respond
+    How it differs from regular pooling
+        Instead of immediate responses, the server holds the request until new data is available
+    How long pooling works:
+        a. client sends an http request
+        b. server holds the request until the data available
+        c. server responds with new data
+        d. Client immediately sends another request
+
+    Use websockets when:
+        High frequency, bi directional data exchange is needed
+        Low latency is critical
+    Use long pooling when:
+        Websockets are not supported or overkill
+        Periodic updates are sufficient(notifications)
+    Real world examples:
+        Slack: Websockets for chat
+        Twitter notificaiton: Long pooling for notifications
+        IoT devices: Long Pooling for intermittent updates
+### Modern APIs go beyond Rest(grPC, GraphQl)
+    Limitations of restapi:
+        Over fetching and underfetching
+        High latency(Mulitple requests are needed to get complex data)
+        Not optimized for realtime communcation(Pooling required)
+    
+    In rest server decides the shape of responses that often leads to over fetching where client gets more data than needed or underfetching where they need additional request to complete a screen
+    Increase network overhead and reduce efficiency
+    The problem becomes more visible in the modern application where the user needs more aggregated data from multiple resources
+
+    Graph QL focus on flexible and precise data retrival, while grPC focus on hight performance communcation between services
+
+    gRPC: A high performance, binary protocal optimized for microservices and realtime communication
+    Graph QL: A flexible query language that allows clients to fetch only the data they need
+
+    gRPC is gets permformace from the combination of design together, the foundation is http2, HTTP2 allows multiple requests and responses to share the same connection simultaneously.
+    This eliminates much of a overhead and keeps communication fast even when services are interacting with each other on same time
+    HTTP2 also enables efficient streaming, instead of client and server opening a new request, a client and server can maintain long lived connection and continously exchange data in both directions, This amkes gRPC systems more efficient for real time systems, event systems, and service to service communcation where updates happen every frequently
+    The second advantage is Rather than sending that verbose json document, gRPC uses protocol buffer(ProtoBuf) data is encoded in compact binary format that is smaller on network but faster on serailizing and deseralizing.
+    The combination of HTTP2 and ProtoBuf for low latency and high thorughput
+
+    gRPC uses and when to use:
+        Microservices - Fast inter service communication
+        Realtime streaming - Full duplex bi directional data transfer
+        IoT and low bandwidth applications - Efficient binary communication
+        Multi-language ecosystem - Auto generated client and server code
+    Suited for live analytics, telemetry, collaborative applications, financial systems
+
+    Graph QL:
+        Instead of multiple REST endpoints, Graph QL has one endpoint where client specify the data they need
+        Graph QL schema defines data types and relationship between data
+        Clients sends query -> Graph ql server resolves fields dynamically
+    
+        No need to create seperate endpoints for mobiles and websites
+        The frontend application decides what data it needs
+        
+        when to use?
+            Frontend optimization: Clients fetch exactly what they need
+            Reducing API Requests: One query replaces multiple REST calls
+            Mobile and web apps: Handles slow network and multiple data sources
+            Aggregating Data from multiple servers: Simplefiles fetching data from different databases and apis
+        Graph QL can be used as an aggregation layer
+        Behind one single graph QL endpoint, the server can pull data from multiple endpoints, multiple servers, multiple microservices or third party api to present a unified response to the client
+        This shields the frontend teams from backend complexity and creates a cleaner integration model
+        It is not primarly about performance it is about flexibility
+        when client requirements vary significantly and data comes from multiple resources graphql simplies how application can communicate
+
+
+
+
