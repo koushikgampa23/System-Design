@@ -556,6 +556,177 @@ This Repo contains system design
         It is not primarly about performance it is about flexibility
         when client requirements vary significantly and data comes from multiple resources graphql simplies how application can communicate
 
+## Architectural Patterns
+    What is a software architecture?
+        The structure of a system, including its components and relationships
+    Architecture impacts scalability, performance and maintainability
+    Importance of system design and Key design
+        Scalability: Ability to handle increased data and traffic
+        Maintainability: How easily the system can be updated or modified(evolved)
+        Performance: Efficiency and responsiveness under load
+### Software Architecture Patterns and styles
+    what is a software architecture?
+    Definition: The high level structure of software system, defining component, their relationships and the way they intract
+    It impacts scalability, maintainability, performance and system behaviour.
+
+    Explanation:
+    Think of it has a blue print of the system, blueprint influences how a structure is built, expanded and maintained
+    Software architecture influences how a system evolves over time.
+    It establishes boundaries, communication patterns and overall organization of solution
+
+    Common Architectural styles:
+        Monolithic
+        Layered(N-tier)
+        Client server
+        Microservices
+        Event Driven
+#### Monolitic Architecture
+    Definition: A single unified system where all the components are tightly coupled and work as a single unit
+    Pros:
+        Simple to develop and deploy
+        Easier to manange in smaller applications
+    Cons:
+        Hard to scale
+        Difficult to maintain as code grows
+        High risk of failure, A single bug can takedown an entire system
+    Usecase:
+        Small scale applications, startups, simple CRUD apps
+    
+    Application: UI - Business logic - data access layer -> database
+    
+    Explanation:
+    Monolitic Architecture in fact many of the software applications begin with this architecture.
+    Because simplicity is more valuable than architectural sophistication.
+    In a monolitic architecture entire application is built and deployed in single unit, The user interface, database logic, data access layer, and supporting functionality all live within the same codebase and typically share the same deployment process.
+    This makes development straight forward because everything stays in one place and developers can easily understand what parts of system interact.
+    Biggest advantage is simplicity, it is easier to Develop, test, deploy and debug because there are no distributed communication concers, service discovery, mechanisms, or interservice dependencies to manage.
+    Scaling becomes inefficient because even if only one module experiences heavy traffic, the entire applicaiton must be scaled
+    Large codebases also becomes harder to understand, test and modify, increasing the overall risk that change in one area impacts other area.
+
+#### Layered(N-tier) Architecture
+    Definition: A system split into multiple layers(eg: presentation, Business Logic, data) to seperate concerns
+    Pros:
+        Clear seperation of concerns
+        Easier to scale and maintain as compared to monolitic
+    Cons:
+        Performance overhead due to layers
+        May result in tight coupling between certain layers
+    Use cases: Enterprise applications, CRM Systems, Banking applications
+
+    Application: User interface -> Business logic -> Data Access -> RDBMS
+
+    Explanation:
+        As application becomes layer mixing user interface code, business rule and database logic in the same space quickly becomes very difficult to manage.
+        The solution was to seperate responsibility into distinct layers, each focused on a very specific concern.
+        The presentation layer handles user interactions, the business layer contains the applications core rules and workflows and the data layer manages communcation with database and external storage 
+        Each layer has a well defined responsibilty and communicates through controlled interfaces, creating a more organized and maintainable structure.
+        The bigges advantage is seperation of concern, when responsibilities are clearly defined, teams can work more efficiently, code becomes eaiser to understand and changes can often made within one layer without impacting the entire application
+        The request has to reach multiple layers before reaching the database and return through the same path, which can introduce additional latency.
+        Overtime layers can also become tightly dependent on one another, make changes more difficut than architecure as intended.
+        It is not primarly focused on scalability, it focused on managing the complexicity
+#### Micronservices architecture
+    Definition: A system built as a collection of small independent services, each focuses on a specific business capability
+    Pros:
+        Independent services can be scaled, deployed and developed seperatly
+        Flexibilty in tech stack for each service
+        Better fault tolerance
+    Cons:
+        Increased complexity in communcation and coordination
+        Need for robust DevOps and automation pipelines.
+    Use cases: large scale applications, e-commerce applications, modern cloud based systems
+
+    Explanation:
+        Instead of treating the entire application as a large unit, microservices organize the system around business domain
+        An ecommerce application contains seperate services like product, inventory, orders, payments and notifications
+        Each service can be developed, deployed, scaled and maintained independently, allowing teams to move faster without coordinating every change across the application.
+        This independence is the advantage of the microservices, services can scale based on their individual work loads, teams can choose technologies that best fit their domain, failures can be often isolated rather than impacting entire application
+        Mainly used in large scale applications, rapidly evolving products.
+        Microservices replaces application complexity with distributed complexity, 
+        What was once a function call now it will be a network call.
+        Teams must deal with service discovery, network latency, retries, monitoring, distributed tracing and data consistancy across the multiple services now.
+        Operation excellence becomes just as importanant as developing the application.
+        That is why microservices are most successfull when supported by strong devops practises, automation, observability, and mature engineering teams
+#### Event driven architecture
+    Definition: A system where components communicate through events(messages) instead of direct calls, enabling loose coupling
+    Pros:
+        Highly decoupled architecture
+        Excellent for handling asynchronous workflows
+        Better scalabilty for high traffic systems
+    Cons:
+        Debugging and tracing becomes more complex
+        Difficult to ensure data consistance across services
+    use cases:
+        Real time systems, IOT applications, financial trading platforms
+#### Factors influncing Architecture Selection
+    Business needs: What problems are we solving? what is the business goal?
+    Scalability: How much traffic and data should sytem to handle?
+    Performance: how fast should the system respond to users?
+    Maintainability: How easy is to make updates, fix bugs, and evolve the system over time?
+### Multi tier architecture
+    Multi tier architecture is a software design pattern that structure the applications into multiple layers, each responsible for specific functions. This seperation enhances scalability, maintainability and security.
+    Key points:
+        Organizes applications into independent layers
+        Seperate concerns: UI, business logic, and data storage
+        Enables better scalability, performance and security
+        Used in web applications, enterprise systems, and cloud architectures
+    
+    Explantion:
+        the teams can modify business rules without redesigning the ui. databases can evolve without affecting application workflows, and individual layers can be scaled based on demand. It also improves security by controlling how data flows between layers, rather than exposing critical systems directly.
+
+#### 2 Tier architecute
+    Definition: The 2 tier architecture consists of Client layer and database layer, the client directly intracts with database, without an intermediate business logic layer.
+    How it works:
+        Client layer: User interface, application logic
+        Database Layer: Stores and retrives data
+        Data flows directly between client and database
+    Pros:
+        Simple to implement
+        Fast for small scale applications
+    Cons:
+        Poor scalability(limited to few users)
+        Security risk(direct database access)
+    Example use case:
+        A desktop application directly quering an sql database
+    
+    Architecture: Presentaion layer - data layer -> database
+
+#### 3 Tier architecture
+    Definition: 3 tier architecture introduces middle layer (business logic layer) between the UI and database
+    How it works?
+        The frontend interacts with business logic layer(API server)
+        The business logic layer processes the request and interacts with database
+    Pros:
+        improves scalability and security
+        Better seperation of concerns
+        Easier maintenance
+    Cons:
+        Slightly higher latency due to extra processing
+    Example:
+        Traditional web applications
+
+    Architecture: Presentational layer -> business logic layer -> data access layer queries -> database
+
+#### N Tier architecture
+    Definition: N tier architecture goes beyond 3-tier architecture by adding more specific layers like caching, API gateway, microservices etc.
+    why use N-tier:
+        Handles high traffic and complex business logic
+        Allows independent scaling of different services
+    Examples:
+        Microservices-based applications
+        Large scale enterprise software
+    
+    Architecture: users -(requests)-> Frontend -(traffic distribution)-> load balancer -(API requests)-> API Gateway -(Routes Requests)-> Microservices layer
+
+    More layers means more infrasturcture, more monitoring, more deployment pipelines and more points of failures to manage
+
+    2-Tier is simple but limited
+    3-Tier is the standard for web apps
+    N-Tier is for large-scale, cloud native systems
+
+
+
+
+    
 
 
 
