@@ -723,7 +723,22 @@ This Repo contains system design
     3-Tier is the standard for web apps
     N-Tier is for large-scale, cloud native systems
 
-
+### Microservices Architecture
+    Definition: Microservices Architecture is a software design pattern where applications are structured as a collection of small, loosely coupled services, each resposible for specific function.
+    Characteristics:
+        Independently deployable services
+        Loosly coupled and modular
+        Scalable and fault tolerant
+    How to identity microservice?
+        Business Capability: Each service should align with a specific business function(Payments, orders, etc)
+        Single Responsibility Principle: A microservice should do one thing well
+        Data ownership: Each microservice owns its own database - avoid shared databases
+        Independently Deployable: Should be deployable and scalable without effecting others
+    How to structure microservices:
+        Decompose by business domain: Use Domain-Driven Design(DDD) to group services logically.
+        Define clear APIs: Services should communicate via well defined apis(REST APis, gRPC, or events)
+        Choose the right granularity: Avoid making microservices too large(monolith in-disguise) or too small (high complexicity)
+        
 
 
     
