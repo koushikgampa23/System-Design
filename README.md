@@ -526,7 +526,7 @@ This Repo contains system design
 
     gRPC is gets permformace from the combination of design together, the foundation is http2, HTTP2 allows multiple requests and responses to share the same connection simultaneously.
     This eliminates much of a overhead and keeps communication fast even when services are interacting with each other on same time
-    HTTP2 also enables efficient streaming, instead of client and server opening a new request, a client and server can maintain long lived connection and continously exchange data in both directions, This amkes gRPC systems more efficient for real time systems, event systems, and service to service communcation where updates happen every frequently
+    HTTP2 also enables efficient streaming, instead of client and server opening a new request, a client and server can maintain long lived connection and continously exchange data in both directions, This makes gRPC systems more efficient for real time systems, event systems, and service to service communcation where updates happen every frequently
     The second advantage is Rather than sending that verbose json document, gRPC uses protocol buffer(ProtoBuf) data is encoded in compact binary format that is smaller on network but faster on serailizing and deseralizing.
     The combination of HTTP2 and ProtoBuf for low latency and high thorughput
 
@@ -738,10 +738,170 @@ This Repo contains system design
         Decompose by business domain: Use Domain-Driven Design(DDD) to group services logically.
         Define clear APIs: Services should communicate via well defined apis(REST APis, gRPC, or events)
         Choose the right granularity: Avoid making microservices too large(monolith in-disguise) or too small (high complexicity)
-        
 
+#### Communication in microservices
+    Synchronous Communication:
+        Rest APIs(simple, highly used but has high latency)
+        gRPC (Efficient, binary format, better performance)
+    Asyschronous Communication:
+        Event Driven messaging(Kafka, RabbitMQ, SNS/SQS)
 
+    If we use rest api every network call adds latency, as services grow response time can increase across the entire request chain.
+    Many orgs use gRPC for service to service communication, since it uses protobuffer and a compact binary fomat, it reduces payload size and delivers lower latency and higher throughput than traditional REST APIs
+    This makes it effective for internal microservices communication, where performance matters a lot.
+    In the asyschoronous communication:
+        A service publishes a event and any interested service can react independently, this creates much looser coupling and allows system to scale much more effectivelty,
     
+    Sychronous communication is ideal when we need immediate reponse, while event driven excel when scalability, resilience, and loose coupling  are our primary goals.
 
+#### Challenges of microservices
+    Data consistancy: Distibuted databases -> Eventual consistency
+    Distributed tracing: Difficult to debug and track requests
+    Network overhead: More API calls -> increased latency
+    Security: Authentication, authorization and data protection
 
+    In a monolith a single database transcation can keep everything syncronozied.
+    In micro service architecture, each service owns its own database which means mainting consistency across the application services requires eventual consistency.
+    
+    For example: when order is placed, updates to inventory, payment, and shipping may occur asyncronously rather than instant, the system remains correct, but consistancy is archieved over time rather than in a single transcation.
 
+    Challenge in debuging and tracking
+    when a user sends a request it travels through 5-6 microservices before getting response, when something goes wrong identifiying where the failure occured can be difficult
+    That is why distributed tracking tools such as OpenTelemetry and Zipkin have become essential
+
+    Network over is another challenge
+    Techiques such as gRPC, caching, request aggregation and asynchronous communication help to reduce overhead.
+
+    Security:
+    In monoliths the security is centerlized the authentication, authorization, data encryption, secure connection to sensitive data are handled centerally.
+    In the microservices each serive needs to handle it.
+    Technologies like API Gateway, OAuth, JWTs, mutual TLS and service mesh is commonly used across the systems
+
+    Microservices solve scalability and organizational challenges, but they also introduce distributed system challenges that architects must deliberately design from day one only.
+
+#### Scaling strategies in microservices
+    Horizontal Scaling: Add more instances of a service
+    Auto scaling: Scale up/down automatically
+    Sharding and Database scaling: Split databases for high traffic services
+
+    Instead of making server more larger and more powerful, we create additional instance of service and distribute traffic across them using load balancer. 
+    For example during a major sale the order service may experience a surge in requests, while other services remain ideally stable.
+    we can scale only the order service instead of entire applicaiton. As system grows, manuall scaling becomes impossible, autoscaling becomes more valuable
+    
+    Platforms like kubernetes can automatically add or remove service instance based on metrics like CPU utlization, memory consumption, or request volume.
+
+    This ensures that the system can handle traffic spikes while avoiding unnecessary infrastructure costs while system is quite
+
+    In large applicaiton the database becomes the bottleneck. To address this architectes use database scaling techniques such as read replicas and sharding.
+    Read-replicas distribute read heavy workloads across database instances, while sharding partition data into smaller segments based on customer ID, tenant id or geographical region.
+
+    The architecural lesson is that true scalability requires thinking beyond applicaiton servers.A scalable microservice platform combines service level scaling, automated elasticity and database optimizations to ensure that the entire systems can continue to grow without sacrificing performance or availability
+
+#### Real world example
+    Netflix: Uses microservices for video streaming and personalizaiton
+    Uber: Scales ride-matching, payments and navigation independently
+    Amazon: Each service(search, payments, recommendations ) runs separatly
+
+#### Summary
+    Microservices = Scalability, Fault Tolerance, Faster development
+    Required API gateways, Service Discovery, Load balancing
+    Challenges: Data consistancy, debugging, deployment complexity
+
+### Event Driven Architecture
+    Definition: A system design where components communicate through events rather than direct calls.
+    Key characteristics:
+        Asynchronous processing
+        Loose coupling
+        Scalability and flexibility
+    why use it?
+        Enhances system responsiveness
+        Enables realtime event processing
+        Supports complex workflows
+    
+    Event Driven communication emerged since service to service communcation directly became bottleneck as system grow. when every component depends on another component responding immediatly, scalability, resilence and flexibity become harder to archieve
+
+    Instead Event driven architecture allows components to communicate through events, signals that something happened, without needing to know who will react to signals.
+
+    A key characterists of this approach is asyncronous processing rather than waiting for response, the service can publish a event and continue its work when the other components processes that event independently.
+    This reduces waiting response time and improves overall system responsiveness.
+    Another major advantage is loose coupling, the producer and consumers of events are seperated each other, which means teams can modifiy, deploy or scale the service independently without creating tight dependency across the system
+    
+    New consumers can subscribe to existing events without modifiying the original service, making it to extend business workflows overtime.
+
+    It is very common in realtime notification, financial transcations, order processing, IoT platforms, and systems where multiple components has to react for events
+
+    The key takeaway is that event driven architecture systems are designed to be responsive, scalable, and adaptable making them a powerful architecture style for modern distributed systems
+
+    Synchronous vs Asychronous Systems
+    Synchronous Communication(Request-Response Model)
+        Blocking calls
+        Tight coupling
+        Example: Traditional HTTP APIs
+    Asychronous Communication(Event Driven model)
+        Non blocking
+        Decoupled components
+        Example: Message Queues and event brokers
+
+    Pub-Sub vs Event Streaming
+        Publish-Subscribe Model(Pub-Sub):
+            Events are broad casted for multiple subscribers
+            Each subscribers get the event once
+            Example: RabbitMQ, AWS SNS
+        Event Streaming:
+            Events are stored and consumed in order
+            Consumers process events at different times
+            Example: Kafka, AWS kinesis
+
+    In pub/sub a publisher broadcasts an event and all interested subscribes receives the event. The publisher doesnot know how the subscribers are, and consumers dont need to know anything about publisher. This makes the system highly decouples and fan out scenarios such as notification, alerts or triggering downstream workloads.
+    Once an event is triggered it is typically not retained for long term replay, so subscribers are expected to process when the event arrives
+
+    Event streaming takes the idea one step further
+    Instead of treating events are transit messages, events here are stored in an ordered, durable log.
+    Consumers can read events whenever they choose, replay historical events or even process the same event stream mulitiple times for different purposes
+    This capability is extermely valuable for analytics, auditing, monitoring, data pipelines and large scale system where event history is valuable asset.
+
+    pub/sub vs event streaming
+    Pub sub focuses on distributing events to interested consumers in realtime,
+    whereas event streaming treats events as a permanent source of truth that can be consumed, replayed and analyzed long after the they were original generated.
+    Choosing between them depends on wheather you only care about delievering events now or wheather you also need to preserve and process event history over time.
+
+#### Key components of event driven systems
+    Event producers(Generate Events)
+    Event Brokers(Transit and store events) - Example: Kafka, Rabbit MQ, AWS EventBridge
+    Event Consumers(React to events)
+    Event Storage(Log-based persistance for replaying events)
+
+#### Challenges in Event Driven Architecture
+    Eventual consistancy(No immediate data synchronoizaition)
+    Ordering Gurantees(Ensuring events are processed in sequence)
+    Fault Tolerance and Retires(Handling failures gracefully)
+    Debugging complexity(Tracking events across microservices)
+
+    Because services communicate asyncronously data updates dont become visible everywhere at the same moment
+    An event may be published immediately, but downstream systems process it some seconds later.
+    This temporary inconsistancy is acceptable, but requires architects to think differently than they would in a traditional transcation system
+    Techniques such as idempotant consumers, compensating actions and carefully designed business workflows are commonly used to manage this reality.
+    Another challenge is maintaining ordering. In distributed systems event can arrive out of sequence or be processed concurrently by mulitple consumers.
+    
+    Imagine processing payment completed event before the corresponding order created event.Without proper control the system may reach the invalid state, This is why platforms such as kafka provide partition based ordering gurantees and why systems use sequence numbers or versioning strategies  
+    
+#### Best practises
+    Use idempotent event processing to avoid duplicates
+    Implement dead letter queues for failed messages
+    Choose right event broker based on system needs
+    Ensure event versioning to handle schema changes
+
+    In distibuted system duplicate event delivery is not a bug. it is a expected reality, Retries, network interpution, and broker failure can all cause the same event to be delivered more than once.
+    Consumers there for be designed so that processing an event multiple times produces the same outcome as processing the event once
+    This prevents such as duplicate payments, duplicate orders or repeated notifications.
+
+    Implement dead letter queues
+    Not every failure can be resolved using retries.
+    Some messages may be malformed, contain invalid data or repeatedly fail business validation, rahter than blocking entire processing pipelines, failed events should be isolated and moved to a dead letter queue, where they can be inspected, analyzed, and handled seperatly
+    This significantly improves system realiability and operational visibility.
+
+    Choosing right event broker
+    kafka excels at high throughput event streaming and long term rentension
+    RabbitMQ is often preferred for traditional message queuing patterns
+    AWS Eventbridge simplify cloud native event routing
+     
