@@ -904,4 +904,19 @@ This Repo contains system design
     kafka excels at high throughput event streaming and long term rentension
     RabbitMQ is often preferred for traditional message queuing patterns
     AWS Eventbridge simplify cloud native event routing
-     
+
+    without the versioning startegy a simple schema change can break downstream services.
+    Therefore designing events with backend compactabilities in mind ensures that producers and consumers can evolve independently without disrupting the entire system
+
+#### Use cases of event driven architecture
+    Logging and auditing(Track changes over time)
+    Real time notification(Chat apps, stock price updates)
+    Microservices Decoupling(Independent scalability, and fault tolerance)
+    IoT Systems(Senor data processing)
+    E-commerce Order Processing(Order placed -> Payment processed -> inventory updated)
+
+#### Summary
+    Multi-Tier architecture: layered approach for scalability and seperation of concerns
+    Micronservices architecture: Decoupled services enabling independent scaling and deployment
+    Event driven architecture: Asyncronous, scalable, and loosely coupled systems.
+
