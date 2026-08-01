@@ -920,3 +920,129 @@ This Repo contains system design
     Micronservices architecture: Decoupled services enabling independent scaling and deployment
     Event driven architecture: Asyncronous, scalable, and loosely coupled systems.
 
+## Web concepts in system design
+### Why websessions matter?
+    Web applications often need to track user state(eg: login status, shopping cart, user preferences)
+    HTTP is stateless, meaning each request is independent
+    Goal: Understand how to maintain state in web application
+    It provides a way to pass mulitple requests with the same user and maintain context across
+    
+    Technologies such as cookies, server-side sessions, and authentication tokens enable applications to track user state, while balancing security, scalability, and user experience
+
+    Http:
+        HTTP doesnot retain memory of previous requests
+        Each request must contain all necessary information
+
+    Techniques for Maintaning state:
+        Session Based Authentication(Server side session storage + Cookie for session IDs):
+            The server maintains session state
+            The client holds only the session id (usually in cookie)
+        Token based authentication(JWT, OAuth Tokens)
+            The session state is embeded within the token itself
+            The server doesnot need to track user sessions
+    
+    In session based authentication:
+        The server owns the user state, the server creates a session record and returns the session identifier to the client.This is typically stored in a cookie at client side.
+        Onsubsequent requests the server sends the session id and server uses that session id to retrive user data.
+        This model is straight forward and secure.
+        As system grows, managing, syncronizing session data across multiple servers can become an operational challenge.
+    Token based authentication:
+        Instead of storing session information on server, the necessary user context is embedded inside a signed token, such as JWT token, and each request carries that token and server validates without looking up any session state on server side.
+        This makes the architecture naturally stateless and easier to scale across distributed systems and microservices.
+
+    Session based authentication offers great control over user session while 
+    Token based authentication simplifies the horizontal scaling.
+
+    In session based authentication:
+        when a user logs in, the server creates a session record containing information such as users identity, permission, and other relevent state. The server then generates a unique session id and sends it back to client, typically through a cookie.
+        from that point on ward, every request automatically includes this session id cookie,The server uses this identifier to locate the corresponding session data and determine who the user is, without requiring them to authenticate again.
+        It works very well in traditional web applications because it gives the server complete control of the session management.
+        Techiniques such as sticky sessions, session replication, or centralized session store like redis.
+    In token based authentication:
+        Instead of storing session information, the user information is packaged into the self contained token that travels through each request.
+        When a user authenticates, the server generates a token commonly a JWT, that contians information such as user's identity, roles and permissions, the client stores this token and sends it back with sequent requests, typically in authorization headers.
+        Rather than looking at session, the server validates the token and extracts the information that it needs.
+        The biggest advantage of this model is scalability. Since the server doesnot maintain the session state, any instance in a distributed system can process the request without relying on shared session storage.
+        This makes it particularly attractive for apis, microservices, mobile applications and cloud native architecture.
+        It has challenges such as token expiration, revocation and security becomes more challenging than simply deleting a server side session.
+        As a result, token security, expiration policy, and proper validation becomes critical part of overall authentication.
+
+#### Security Concerns in Session Management
+    Session Hijacking: Stolen session IDs
+    Cross Site Request Forgery(CSRF): Unauthorized actions
+    Secure cookie Handling: Avoiding theft via secure, HTTPOnly, and Same site flags
+
+    If a attacker can compromise a users session, they can often bypass the entire authentication and act as that user, One of the most common threat is session hijacking, where a user obtains a valid session id and uses it to impersonate the real user.
+    This can happen through network interception on unsecured connections or client side vulnerability like XSS.
+    To reduce this risk modern applications enforce HTTPS, rotate session identifiers after authentication, and limit session life times.
+    The another very major concer is cross site request forgery, or CSRF.
+    A malicious site tricks a user's browser into sending authenticated requests to another application where user is already logged in. Because the browser includes session cookies, the request may appear legitimate. But this are not legitimate requests.
+    Defenses such as CSRF tokens, same site cookies and additional verfication for sensitive action help to prevent these attacks
+
+#### Best practises for scaling session management
+    Sticky sessions vs Distributed session
+    Storing session data in redis, Memcached
+    Stateless authentication(JWTs) for scalability
+
+    Sticky sessions a load balancer always ensures that a users request is always sent to the same server, while it is simple to implement that creates uneven load and impact availability if the server becomes unhealthy.
+    A more scalable design is distributed session management.
+    Instead of storing sessions locally in application servers, sessions data is placed in shared storage where all the servers can access this allows request to be routed to any available instance improving scalability and fault tolerance.
+    
+    Tech such as redis and mem cached is most commonly used
+        They are inmemory data stores,They provide extermly fast lookups while enabling session sharing across the entire server fleet.
+        In large scale systems redis is often prefered since it offers persistance, replication, and high availability.
+    
+    For maximum scalability, many modern architecutures move towards stateless authentication using JWTs since authentication data is carried within the token itself application server no longer need to perform session lookups
+    This reduces infrastructure dependencies, and works perfectly well in microservices, cloud native platforms and api driven systems
+
+### How CSRF validation implemented in django
+    CSRF attack?
+        CSRF (Cross-Site Request Forgery) is an attack where an attacker tricks a user's browser into sending an authenticated request to a trusted website where the user is already logged in. The attack works because the browser automatically includes the user's authentication cookies with the request.
+
+    1.user logins the server generates session id, csrf token(random string) and sets cookie in browser
+        HTTP/1.1 200 OK
+        Set-Cookie: sessionid=abc123; HttpOnly; Secure
+        Set-Cookie: csrftoken=XYZ789; Secure
+    2.Frontend sends request to backend
+        const response = await axios.post(
+            "/api/transfer",
+            {
+                // your request body
+                // ...
+            },
+            {
+                withCredentials: true, // equivalent to credentials: "include"
+                headers: {
+                "X-CSRFToken": Cookies.get("csrftoken"),
+                },
+            }
+        );
+        Note:
+            1.browser automatically sends cookie
+            2.React explicity sends X-CSRFToken in headers
+    3.Django recives the request
+        Django checks the session id is valid or not from session table
+        CSRF middleware checks
+        Cookie token == Header token (or)
+        Cookie token == Form token
+        valid:
+            Request accepted
+        Invalid:
+            403 forbidden
+    4.Is the CSRF token stored in the database?
+        by default No
+        If CSRF_USE_SESSIONS = True is configured, Django stores the CSRF secret inside the user's session instead of in a cookie. It still does not create a separate CSRF table.
+    
+    Scenario: How Django CSRF Protection Prevents Cross-Site Request Forgery
+    - A user is logged into andhrabank.com and has valid cookies (sessionid and csrftoken) stored in their browser.
+    - The user then visits evil.com.
+    - evil.com can attempt to make the browser send a request to andhrabank.com (a Cross-Site Request Forgery attack).
+    - Depending on the cookie's SameSite setting, the browser may automatically include the cookies (sessionid and possibly csrftoken) in that request.
+    - However, evil.com cannot read the cookies belonging to andhrabank.com because of the browser's Same Origin Policy.
+    - In a React + Django application, React reads the csrftoken cookie and sends its value in the custom X-CSRFToken header.
+    - evil.com cannot send the correct X-CSRFToken header because it does not know the CSRF token value. It cannot read the cookie or access the React application's memory.
+    - Django's CSRF middleware validates that the CSRF token in the cookie matches the token - received in the request header (or the hidden form field for Django templates).
+    - Since the attacker cannot provide the correct header or form token, the validation fails and Django returns 403 Forbidden.
+    - As a result, the attacker may be able to cause the browser to send cookies, but they cannot successfully perform authenticated state-changing operations because they cannot satisfy the CSRF validation.
+
+
