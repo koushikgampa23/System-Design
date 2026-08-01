@@ -1045,4 +1045,93 @@ This Repo contains system design
     - Since the attacker cannot provide the correct header or form token, the validation fails and Django returns 403 Forbidden.
     - As a result, the attacker may be able to cause the browser to send cookies, but they cannot successfully perform authenticated state-changing operations because they cannot satisfy the CSRF validation.
 
+### Serialization: Data Exchange and Storage formats
+    Why serialization matters?
+        Applications need to exchange and store structured data efficiently
+        Serialization converts complex objects into a format that can be easily transferred.
+        Used in APIs, databases, caching, and distributed systems
+    
+    Deserialization:
+        Converting it back to an object
+
+    Essential for distributed systems and inter process communication
+    
+    Explanation:
+    The challenge is that computers work with in-memory objects but networks and storage systems needs data in a transferable format
+    That gap is exactly solved by serialization
+    Serialization converts complex application objects into a standard format that can be transmitted, stored and reconstructed elswhere.
+    Without serialization, communication between services, platforms and programming languages would be difficult and inefficient
+    you encounter serializer everywhere in system design
+    APIs serializes data before sending responses, databases store serialized represention of objects, caching systems use this to persist data in memory,and distributed system rely on it exchange infromation across the services
+
+    Now as system grows and traffic increases the choice of serialization format directly impacts performance, bandwidth usage, storage efficiency and interoperatability
+
+    when the data reaches the destination the deserialization performs the revers operation, reconstructing the original object so that the application can work with it as if it were created locally
+    This capability is fundametal to modern distributed systems
+
+#### Common Serialization Formats
+    JSON - Human Readable, widely used in REST APIs
+           simple key-value structure, easy to parse
+           Text based, large in size as compared to binary formates
+    XML - Structured but verbose, used in legacy systems
+        Tag based markup language, used in legacy systems and configuration files
+        More complex than json but supports rich data structures
+        Verbose, leading to larger payload
+    Protocol Buffers(Protobuf) - Compact and efficient, used in gRPC
+        Binary format developed by google
+        Faster and smaller than json/xml, but requires schema defination
+        Used in gRPCs for high performance APIs
+
+    json optimizes for simplicity and interoperability, XML for structure and validation and protobuf on performance and scalability
+
+#### Readability vs efficiency vs compactability
+    Readability: JSON & XML are human reable but inefficient
+    Efficiency: Protobuf & Avro are compact, reducing bandwidth usage (no longer human readable requires tooling to read)
+    Compatability: XML support schema evolution, JSON has limited support
+
+    Serialization in APIs
+        Rest APIs mostly uses JSON
+        gRPC APIs use protobuf for efficiency
+        XML is still used in SOAP-based web services
+    Serialization in caching and Data storage
+        Redis and Memcached: Store serialized json/protobuf data.
+        Databases: NoSQL databases like mongodb use BSON(Binary JSON)
+        Big Data: Protobuf is used for efficient storage and schema evolution
+#### Summary:
+    Serialization enables efficient data exchange and storage
+    Choose right format based on performance, readability and compatability
+    Json for APIS, protobuf for efficiecny, Avro for big data
+    Impacts bandwidth, storage efficiency and processing speed
+
+### CORS: Cross Origin resource sharing
+    Why CORS matters? 
+    The problem: Browsers enforce Same Origin Policy(SOP), blocking cross origin requests by default.
+    The Need for CORS
+        Modern webapplications rely on APIs hosted on different domains (eg. frontend on app.com and api on api.com)
+        CORS is a mechanism that allows secure cross origin communication
+    
+    How CORS works: Request and responses
+    CORS is server driven -  the server must explicity allows access
+    Two types of request:
+        simple request: GET, POST(without custom headers)
+        preflight requests: Needed for PUT, DELETE, or custom headers
+    CORS Headers control:
+        Access-Control-Allow-Origin(which origins can access)
+        Access-Control-Allow-Methods(allowed HTTP methods)
+        Access-Control-Allow-Headers(custom headers that can be sent)
+    
+    Explanation:
+        Instead of removing browsers security, it allows servers to explicity declare which origins are allowed to access their resources.
+        CORS provides a controlled way to selectively grant access to some domains.
+        Creating this balance between security and flexibility is key to build modern web applications that comminicate safely across domains
+
+        CORS always feels like a browser feature, it is actually controlled by server
+        The browser simply enforces the rule, when a cross-origin request is made the server must explicity tell the browser wheather the request is allowed or not.
+        For straight forward operations like GET, post the browser sends the request directly
+        when a operation could potentiallly modify the resource, such as put or delete request or custom header involved the browser becomes much more cautious.
+        Before sending a actual request the browser sends a preflight check using options request.
+        The server responds with it cors policy and only if the policy permits the operation
+
+
+
 
