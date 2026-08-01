@@ -1105,20 +1105,42 @@ This Repo contains system design
 
 ### CORS: Cross Origin resource sharing
     Why CORS matters? 
-    The problem: Browsers enforce Same Origin Policy(SOP), blocking cross origin requests by default.
+        The problem: Browsers enforce Same Origin Policy(SOP), blocking cross origin requests by default.
     The Need for CORS
         Modern webapplications rely on APIs hosted on different domains (eg. frontend on app.com and api on api.com)
         CORS is a mechanism that allows secure cross origin communication
     
     How CORS works: Request and responses
-    CORS is server driven -  the server must explicity allows access
-    Two types of request:
-        simple request: GET, POST(without custom headers)
-        preflight requests: Needed for PUT, DELETE, or custom headers
-    CORS Headers control:
-        Access-Control-Allow-Origin(which origins can access)
-        Access-Control-Allow-Methods(allowed HTTP methods)
-        Access-Control-Allow-Headers(custom headers that can be sent)
+        CORS is server driven -  the server must explicity allows access
+        Two types of request:
+            simple request: GET, POST(without custom headers)
+            preflight requests: Needed for PUT, DELETE, or custom headers
+        CORS Headers control:
+            Access-Control-Allow-Origin(which origins can access)
+            Access-Control-Allow-Methods(allowed HTTP methods)
+            Access-Control-Allow-Headers(custom headers that can be sent)
+    
+    Preflight requests and CORS headers
+        Some requests require preflight checks(sent via OPTIONS request)
+        Browser first sends a preflight request before sending the actual request
+        If the server responds with the valid CORS headers, the browser allows the request
+        Key headers:
+            Access-Control-Allow-Origin: https://example.com
+            Access-Control-Allow-Methods GET, POST
+            Access-Control-Allow-Headers Authorization, Content Type
+    Common Security risks
+        Overly permissive CORS( Access-Control-Allow-Origin:*)
+        Allowing credentials with *
+        leads to security vulnerabilities
+        Exposing sensitive APIs via improper CORS settings
+    Mitigation Strategies:
+        Use a whitelist of trusted origins instead of *
+        Set correct CORS policies for different API endpoints
+        Use reverse proxys or API Gateways to handle CORS securely
+    How API Gateways and reverse proxies help?
+        Reverse Proxy handle cross origin requests internally to avoid CORS issues.
+        API Gateway enforce CORS policies centrally, ensuring security and consistance
+        Both improve performance by reducing unnecessary browser preflight requests.
     
     Explanation:
         Instead of removing browsers security, it allows servers to explicity declare which origins are allowed to access their resources.
@@ -1130,7 +1152,158 @@ This Repo contains system design
         For straight forward operations like GET, post the browser sends the request directly
         when a operation could potentiallly modify the resource, such as put or delete request or custom header involved the browser becomes much more cautious.
         Before sending a actual request the browser sends a preflight check using options request.
-        The server responds with it cors policy and only if the policy permits the operation
+        The server responds with it cors policy and only if the policy permits the operation the browser will processed with real request.
+        The decision is driven by set of response headers.
+
+## Scalability in System Design
+    Scalability is the ability of a system to handle an increasing amount of work or its potential to accomodate growth.
+    It ensures performance, reliability and availibity under growing load.
+
+    why do systems need to scale?
+        User base growth(eg. Launching in new regions)
+        Increasing data volumes(eg: IoT analytics)
+        Peak events(eg: Black friday sale, ticket sales)
+        Avoid service degradation or downtime
+        Meet performance SLAs
+    Types of scalability
+        Vertical Scaling: Add more CPU/RAM to one server
+        Horizontal Scaling: Add more servers to distribute the load
+
+    Explanation:
+    Maintaing good user experience as demand increases.
+    The systems ability to grow as the business grow with redesign of system
+    Growth can come in any form more users, more requests, more data and more transcations.
+
+    Vertical scaling offers simplicity
+    Horizontal scaling offers greater growth potential and resilience.
+
+### Common challenges in scalability
+    Latency:
+        Delay between request and response
+        Causes: Network hops, slow db queries, synchoronous calls
+        Amplified in microservices/distributed systems
+    Bottlenecks:
+        One slow component = System wide slowdown
+        Example: DB locks, memory limits, single threaded processing
+        Hard to predict as system grows
+    Downtime:
+        More nodes = more failure points
+        Updates, redeployments, scaling events can cause outages
+        High availibity becomes harder
+    Cost:
+        Infrastrucute isnt fee - CPU,RAM, bandwidhth, etc.
+        Autoscaling without limits - budget nightmare
+        Over provisioning = wasted speed
+
+    Explanation:
+        Every network call, db query, every service to service call adds latency
+        In distributed system a single user request may pass through mulitiple servers before a response is returned, making latency a critical business concern
+        No matter how scalable our architecture looks, one overloaded component can limit the performance of entire system
+        A busy database, resource constraint server, or sequential processing step can become the point where growth starts to break down
+        Scaling also increses downtime, More servers, services and dependencies. All this means more potential failure points.
+        Deployment infrastructure changes, and scaling events must carefully managed to maintain high availibility.
+        Adding capacity increases performance, but excessive scaling can quicky drive infrastructure costs beyond what the business can justify
+
+### Vertical, Horizontal and Diagonal scaling
+    Vertical: Upgrade one machine
+        Upgrades servers CPUs, RAM, Disk
+        Easy to implement(less complex)
+        Limits: Physical Cap, risk of single point of failure
+    Horizontal: Add more machines
+        Add more nodes to the distributed traffic/load
+        Requires load balancer, stateless design
+        Complex setup (coordination and replicaiton)
+    Diagonal: Start vertical then go horizontal
+        Hybrid approach: start vertical add horizontal as needed
+        Common in cloud native apps
+        Cost effective + long term ready
+
+        In the diagonal scaling it start with small to control cost, then automatically add capacity as demand increases, giving teams flexibility without requiring large upfront infrastructure investment.
+    
+    Strategy    Cost    Complexity  Performance
+    Vertical    Low-mid Low         Medium
+    Horizontal  High    High        High
+    Diagonal    Medium  Medium      High
+
+    Real world examples:
+        Twitter: Moved from monolith -> horizontal scaling(microservices)
+        Small Startups: Vertical scaling for MVP
+        AWS lambda apps: Start diagonal with autoscaling
+    When to choose:
+        Startups: vertical(cheaper, simpler)
+        Scaling apps: horizontal(resilience + capacity)
+        Cloud native: diagonal(Flexibity + cost balance)
+### Understanding load balancers: Types, Algorithms and cloud solutions
+    Load balancer is a intelligent traffic distribution system that works between users and application servers. Instead of allowing one machine to handle everything, requests are spread of multiple servers, improving resource utilization and preventing overload.The result is better response time, more consistant user experience.
+    Improves resilience too, In production, servers fail, deployments go wrong and infrastructure issues occur. A load balancer continously checks server health and automatically routes traffic from unhealthy instances, helping the system remain available during failures
+    As demand increases we can add more servers without chaning how users access the applicaiton.This allows capacity to grow incrementally rather than a single machine
+
+    Why load balancing is needed?
+        High avalibility: Ensures System uptime even under high traffic
+        Traffic distribution: Spreads requests evenly across servers
+        Prevents overload: Avoids overburdening a single server
+        Improves Performance: Reduces latency and enhances response times.
+        Handles Failures Gracefully: Redirects traffic in case of server failure
+        Supports scalability: helps scale systems efficiently
+        Example: A high traffic e commerce site uses load balancing to handle peak hour requests
+    
+### Types of load balancers
+    Based on layer
+        layer 4(Transport layer): 
+            - Operates at TCP/UDP level, distributing requests based on network level data
+            - They only look at information such as IP address and ports for making routing request without inspecting the actual request.Because they process less information they are extermly fast and often used for high throughput and low latency work load
+        layer 7(Application layer): 
+            - Operates at http/https level, making routing decisions based on request content
+            - They can examine URLS, headers, cookies and other request attributes to make more intelligent routing decisions. For example a request to /checkout service may be routed to dedicated transcation service, while a request to /product is sent to different background server. It comes with additional processing overhead, but it enables much more smarter traffic management
+
+    Based on Deployment:
+        Hardware load balancers: specialized devices(F5, Citrix NetScaler)
+        Software load balancers: Ngnix, HAProxy, Envoy
+        Cloud based load balancers: 
+            Cloud offers fully managed load balancers
+            AWS Elastic load balancer(ELB), Google cloud Load Balancing
+### Load balancing strategies
+    Static Load balancing:
+        Round Robin: Distributes requests sequentially to each request
+            works well when servers have similar capacity and workload is predictable
+        Least connections: Direct traffic to the server with the fewest connections
+        Ip hasing: Routes request based on client IP.
+    Dynamic Load balancing:
+        least Reponse time: Sends requests to server with the fastest response
+        Adaptive Load balancing: Uses realtime monitoring to make decisions(cpu, server health)
+        Weighted Load balancing: Assigns different weights to servers based on capacity
+    
+    The problem with static load balancing is that they assume system state is relatively stable. In production environment that is rarely true. Traffic patterns change servers experience different workloads, and infrastructure conditions continously evolve
+
+    Instead of following predefined rules the dynamic load balancer make decisions based on real time conditions, it provides better resource utilization, resilence as system becomes larger and more unpredicatable
+
+#### Choosing right load balancer
+    layer 4 vs layer 7
+    Scaliable needs: matching right load balancer for traffic volume
+    Security concers: SSL termination and DDoS protection
+    Use cases:
+        Ngnix/HAProxy for web applications
+        AWS ELB for cloud native applications
+        Hardware load balancers for enterprise data centers
+#### Summary
+    Load balancing enhances scalabilty, reliability and performance
+    Different types exist based on layers and deployment models.
+    Choosing right strategy depends on traffic patterns and system needs
+    Essential for high available and resilient architectures
+
+### Autoscaling and best practise in cloud
+    What is autoscaling?
+        Autoscaling = automatic adjustment of compute resources based on load
+        Ensures performance, availiabilty and cost efficiency
+        Common in microservices, webapps, and event driven systems
+    
+    Explanation:
+        Autoscaling continously monitor demand and automatically adjusts the compute capacity, wheather adding instances during traffic spike or removing them when demand drops.
+        The goal is not just handling users it is about maintaining perfect balance between perforamce, avaliability and cost.
+        
+
+
+
 
 
 
