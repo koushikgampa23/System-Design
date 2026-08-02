@@ -1296,11 +1296,55 @@ This Repo contains system design
         Autoscaling = automatic adjustment of compute resources based on load
         Ensures performance, availiabilty and cost efficiency
         Common in microservices, webapps, and event driven systems
-    
-    Explanation:
-        Autoscaling continously monitor demand and automatically adjusts the compute capacity, wheather adding instances during traffic spike or removing them when demand drops.
+        Main goal: Monitor workload, make scaling decisions and provision resources automatically.
+
+    Autoscaling continously monitor demand and automatically adjusts the compute capacity, wheather adding instances during traffic spike or removing them when demand drops.
         The goal is not just handling users it is about maintaining perfect balance between perforamce, avaliability and cost.
-        
+
+    How autoscaling works?
+        Triggers:
+            CPU usage
+            Memory
+            Request Rate
+            Queue length
+        Types:
+            Horizontal Scaling: Add/Remove instance
+            Vertical Scaling: Resize a single instance
+        Scaling policies:
+            Reactive(based on threshold)
+            Predictive(based on trends)
+    
+    A platform that continously monitor key signals such as CPU utilization, Memory Usage, request volume, or queue depth to understand the current workload.
+    When those metrics indicate increasing demand, the system decides wheather to scale horizontally by adding more instance or vertically by upgrading the resource of exisiting resource.
+    
+    Reactive polices respond to realtime conditions, such as CPU usage exceding a predefined threshold. They are simple and widely used, but they react only after the load has already increased.
+    Predictive Policies goes one step ahead further by analyzing the historical pattern and forecast future demand, allowing capacity to be added before traffic spikes even occur.
+
+    Autoscaling across Cloud providers
+    AWS- Auto Scaling for EC2, Lambda, ECS, EKS
+    Azure - Autoscaling via VM Scale sets, App services, AKS
+    GCP - Autoscaling with MIGs, Cloud Run, Functions, GKE
+
+    Monitoring and Proacive scaling
+        Use metric like:
+            CPU,Memory, Network
+            Queue Depth, Custom KPIs
+        Proactive scaling:
+            Predictive algorithms(based on ML or trends)
+            Scheduling scaling(known traffic patterns)
+        Tools: Cloud watch, Prometheus + Grafana, Azure Monitor, GCP operations
+    Cost optimizations:
+        Avoid over provisioning - scale just enough
+        Use spot/preemptible instances for batch workloads
+        Apply resource limits and quotas
+        Rightsize regularly based on actual usage
+        Use auto pausing or scale to zero features for idle services
+## Storage - Database and Storage
+### Storage in system design and CAP theorem
+    All system generate and consume data - storing is essential
+    Storage impacts performance, reliability and cost
+    Persistant storage enables everything from user profiles to search history to analytics
+    
 
 
 
