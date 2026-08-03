@@ -1614,9 +1614,43 @@ This Repo contains system design
         This is why critical operations such as viewing a just updated account balance or order status may still need to read from the primary database
 #### What is sharding?
     Spliting database across multiple databases to scale horizontally
+    why its needed?
+        Performance and storage limits of a single node
+    Types of sharding
+        horizontal sharding: rows are distributed across shards(most common)
+        Vertical sharding: Tables or columns are split across shards based on function or access pattern
 
-
-
+    Explanation:
+        Instead of storing data in one database, we partition it across multiple independent databases called shards
+        Each shard owns a portion of the dataset and processes only the request related to that data
+        By distributing both storage and work load, the system can continue grow almost indefinitely by adding more shards
+        The most common approach is horizontal sharding, where rows are distributed across shards based on the key, key could be user id, customer id or region.
+        Vertical sharding takes different approach, Instead of spliting rows, it seperates data by busiess function or access pattern
+        For example: User profile, billing data, analytics data may live in different databases
+        Once data is distributed, the system must determine where the data live, route requests to the correct shard and handle operations that span across multiple shards
+        That adds significant architectural complexity
+#### Sharding strategies
+    Range Based Sharding
+        Split by value ranges(e.g: user_id=1-1000)
+        Can create hot spots
+    Hash based sharding
+        Distribute using a hash function
+        Even distribution but harder to query ranges
+    Consistent Hashing for resilient hash based sharding
+        Traditional hashing breaks when nodes are added/removed
+        Consistent hashing solves this: only a subset of keys needed to be remapped when topology changes
+        Enables better elasticity and fault tolerance
+    Geo based Sharding
+        Shard by user region/location
+        Useful in geo distributed systems
+    
+    Explanation:
+        If new data continously falls in same range, one shared can overload while other shareds remain idle, thus creating hotspots
+        This can solved using hash based sharding it will distribute data evenly using hash function
+        This produces better load distribution and prevents single shard from bottleneck
+        The tradeoff is that data losses natural ordering, making range based queries more complex and often requiring requests to multiple shards
+        When a node added or deleted, it forces large amounts of data to be redistributed
+        Consistent hasing designed to solve this problem: only a subset of keys needed to be remapped when topology changes
 
 
 
