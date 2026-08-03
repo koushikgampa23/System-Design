@@ -1441,9 +1441,110 @@ This Repo contains system design
         AP: This systems choose to remain operational even when parts of the network cannot communicate, Networks continous recieving responses but some of those responses may remain stale util replicas syncronize data
         This tradeoff's works well for workloads like social media posts, product catalogs, recommendation and content platforms where a slightly outdated response is usually acceptable
         CA: In theory this systems provide both correct and continous availability. The catch is that this only work when network partitions doesnot occur, since network partitions are evitble, it truly works at single node system or tightly coupled deployment rather than large scale distributed architectures.
-        
 
+### Database models SQL vs NOSQL
+    What is a database?
+        A structured way to store, retrieve and manage data
+        Supports persistant storage and efficient quering
+        Core component of backend systems, from small apps to global platforms
+    
+    Explanation:
+        A database provides persistant layer, giving us a reliable way to store information and retrive it efficintly when application needs it.
+        But databases are more than a storage, They allow us to query, filter, update and manage data in strucuted way, which becomes critical as application grows.
+#### Intro to Relational databases(SQL)
+    Data stored in rows and columns
+    Enforces strict schema(structure)
+    Uses SQL(Structured query Language) for queries
 
+    Explanation:
+        Relational databases have been the backbone of enterprise applications for decades because they provie highly structured and predictable ways to manage data. Instead of storing data in loosely organized records, they organize data into tables made of rows and columns, making the relationship between different pieces of data explicit and every easy to manage.
+        Schema first approach makes SQL Db powerful
+        Before data is stored, we define its structure, what fields exist, their data type and the rules they must follow
+        This descipline helps to maintain data quality and consistancy as systems grow
+        The major advantage is quering power. Using sql engineers can filter, aggregate, sort and combine data across multiple tables with remarkable flexibility.
+    
+    Core concepts of Relational Databases
+        Schemas: predefined strutures(tables, columns, datatypes)
+        Joins: Combine data across multiple tables
+        ACID Properties:
+            Atomicity: all or nothing
+            Consistancy: data integrity maintained
+            Isolation: transcations doesnot interfere(prevents concurrent transcations from corrupting each other work)
+            Durability: Changes survive system failures(ensures that commited changes survive crashes and system failures)
+    
+    Limitions of Relational Databases
+        Not ideal for
+            Rapidly changing or schema less data
+            Large-scale horizontal scaling
+            Flexible or nested data(eg: JSON blobs)
+    Explanation:
+        Relational databases excel on a single powerful server, but distributing data across many machines introduces complexity around sharding, repliacation and consistancy
+        As traffic reaches internet scale, scaling a traditional sql database becomes increasingly difficult and operationally expensive.
+        They can also feel less natural when working with highly flexible or deeply nested data
+
+#### Into to NoSQL
+    Designed for flexibility and scale
+    Schema less for dynamic schema
+    Types:
+        Document(Mongo Db)
+        key-value(Redis, Dynamo Db)
+        Columnar(Cassandra, HBase)
+        Graph(Neo4)
+    Explanation:
+        No SQL databases prioritise flexibility, scalability and performance for specific type of work loads
+        Many No SQL databases allow data structures to evolve without requiring rigid schema definition upfront.
+        This makes them well suited for rapidly changing applications, user generated content, event data and other scenarios where the shape of the data is not always predictable
+        NoSQL is not a single technology, It is a family of database models, each optimized for different purposes.
+
+        - Document databases store rich JSON like structures and ideal for flexible application data.
+        - Key-value focus on extermly fast lookup and very low latency
+        - Columnar databases focus on high write throughput and large scale distributed workloads
+        - Graph databases specialize in traversing complex relationships between entities
+
+    No SQL deepdive
+        Document databases:
+            JSON like structures (key-value pairs, nesting supported)
+            ideal for content management, user profiles
+            Example: Mongo db
+        Key value databases:
+            Simple, fast, key-based lookup
+            High performance, low latency
+            Example: Redis, Dynamo DB
+        Columnar databases:
+            Store data by column, not row
+            Optimized for analytics queries over large datasets
+            Example: Cassendra and HBase
+        Graph databases:
+            Stores entites and relationships as nodes and edges
+            Efficient for hightly connected data(eg: social networks)
+            Example: Neo4j
+    
+    Base properties in NoSQL
+        Basically Available: Always returns a response (even if stale)
+        Soft state: System state may change over time
+        Eventually consistant: Data will be consistant...eventually
+
+    Explanation:
+        The key idea behind base is that in large scale distributed systems, being available to users is often more important than having every node reflect the latest update immediately.
+        If a user requests data, the system responds even during failures or network partitions though that data may not be the most updated to date version of data.
+        Because data is replicated across mulitple nodes, different replicas can temporarly hold different values this is soft state
+        A system will continously converging towards a synchorinzed view of the data.Overtime updates propate through a cluster and all replicas eventually agree on the same value a property known as eventually consistancy
+    
+    SQL tends towards CP, NoSQL tends towards AP or Base
+
+#### When to choose what?
+    when to use SQL
+        Complex queries and relationships
+        Strong consistancy needed
+        Structured and well known schema
+        Ex: Banking, ERP, Inventory Systems
+    when to use No SQL
+        High Scalability needed
+        Flexible or evolving data structure
+        Low-latency or high volume operations
+        Ex: IoT,Recommendation Systems, Caching, logs
+### Advanced database Topics: Sharding, Replication and Polyglot Persistance
+    
 
 
 
