@@ -1543,8 +1543,79 @@ This Repo contains system design
         Flexible or evolving data structure
         Low-latency or high volume operations
         Ex: IoT,Recommendation Systems, Caching, logs
+
 ### Advanced database Topics: Sharding, Replication and Polyglot Persistance
+#### Scaling strategies - SQL vs No SQL
+    Vertical Scaling(scale up) - Traditional SQL databases
+        How it works: By adding more CPU, RAM, or SSD to a single database server
+        Common with: Relation Db's like Postgresql, MySQL, Oracle
+        Pros:
+            Simple architecture
+            Strong consistency(ACID gurantees)
+        Cons:
+            Limited by hardware capacity
+            Cost grows non-linearly
+            Risk of single point of failure
+    Horizontal Scaling:
+        How it works: Add more database nodes to distribute data and load
+        Common with: NoSQL DBs like MongoDb, Cassandra, Dynamo Db
+        Pros:
+            Elastic Scalability
+            Handles large scale traffic and big data
+            Better fault tolerance
+        Cons:
+            Complex architecture
+            Weaker consistency(often eventual)
+#### What is replication?
+    Copying data from one database node to another for redundancy and performance
+    Benefits:
+        Fault tolerance
+        Read performance improvement
+        Data availability
+    Trade offs in real world systems(CAP theorem)
+        Replication may favor availability
+        Strong consistancy may sacrifice availability
     
+    Explanation:
+        Since data is maintained in one database, if that machine fails or becomes overloaded, or losses connectivity, the entire application is at risk.
+        Replication solves this exact issue by maintaning copies of the same data across multiple database nodes.
+        The immediate benefit is reslience, if one node becomes unavailable, another replica can continue to serve the request.
+        Thereby significantly improving fault tolerance and overall system availability
+        Replication also help with scale, In many applications read traffic far exceeds write traffic.
+        By distributing read requests across multiple replicas, we can increase throughput without continously upgrading a single database server.
+        The moment the data exist on multiple nodes, keeping every copy perfectly syncronized becomes challenging, especially during network failures or partitions
+        As a result many real world systems prioritize availability and allow replicas to be temporarly out of sync, leading to eventual consistance.
+#### Leader follower replication
+    how it works?
+        Writes go to the leader
+        Read from followers
+    Consistancy Considerations:
+        Asynchronous replication = possible lag
+    
+    Example:
+        In this model leader acts a single point of truth. Every write, wheather it is write, update, delete is first commited to leader
+        Those changes are propagated to one or more followers which primarly serve read requests
+        This allows system to scale read traffic efficiently without overwhelming the primary database
+        As read demand grows, we can add more followers and distribute queries across them.
+        In most production systems, replication is asynchoronous to avoid slowing down the writes.That means there is a small delay between the change being commited to the leader and the same change appearing on the followers
+        During this window, the users reading from follower may see some stale data
+        We gain scalability, performance, and availability but we may sacrifice immediate consistancy
+#### Read Replicas
+    Use case:
+        Scaling ready-heavy workloads
+    Difference from lead-follower:
+        Often used just for load balancing reads
+        Doesnt take part in writes
+    
+    Explanation:
+        They exist primarly to distribute read traffic and improve performance. All writes still goes to the primary database and the replicas simply stay synchoronized with it and serve the queries
+        During traffic spikes, additional replicas can often be added with minimal application changes, allowing a system to scale horizontally for reads without redesining the database architecture.
+        The tradeoff remains is consistancy, since they synchronize async there a may be a delay in recent change appear.
+        This is why critical operations such as viewing a just updated account balance or order status may still need to read from the primary database
+#### What is sharding?
+    Spliting database across multiple databases to scale horizontally
+
+
 
 
 
