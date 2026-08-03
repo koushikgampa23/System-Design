@@ -1344,7 +1344,104 @@ This Repo contains system design
     All system generate and consume data - storing is essential
     Storage impacts performance, reliability and cost
     Persistant storage enables everything from user profiles to search history to analytics
+
+    Explanation:
+        The storage choices might effect system response time, system reliability, operational cost, scalability limts and even the user experience
+        A fast applicaton with slow storage will eventaully become bottleneck while unreliable storage can turn minor failure into permanent loss.
+        Think about the features users interact with every day - profiles, preference, shopping cards, search history, analytics and audit logs.
+        All this depens on persistant storage that reliably retain and server data over a long periods of time.
     
+    Structured vs unstructured data
+        Structured: Rows/Columns, predefined schema(eg. SQL schema)
+        Unstructured: No schema, flexiable format(eg:images, videos, logs)
+    
+    Explanation:
+        Structured data is organised and follows predefined schema. Think about user accounts, orders, payments. Every rows follows same format, which makes quering, filtering and joinin data extremely efficient.
+        This predictability is why relational databases are so effective for traditional systems.
+        Unstructed data is every different content such as videos, documents, applicaiton logs, and audio files does not fit into rows/columns.
+        The format is flexible but flexibility comes with different storage and retrival challenges. Instead of complex sql queries this files are typically stored in object storage systems, and accessed through metadata or specialized indexing mechanisms.
+        An ecommerce application might store custom and order details in relational database while product images, invoices, and user generated content live in object storage.
+    
+    Categories of storage
+        Database storage(SQL, NOSQL)
+        Object storage(eg: S3)
+        File storage(eg: NFS)
+        Block storage(eg: EBS)
+    
+    Explanation:
+        - Data base storage is optimized for application data that needs to be queried, updated and related to other data.
+        This is prefered by traditional applications
+        - Object storage takes different appraoch instead of storing data in tables or files system, it stores objects which can scale into billions of items
+        This is prefered by images, videos, documents, backups and logs archieves, where durability and massive scale matter more than low latency updates. 
+        - File storage provides the familier folder and file hierarchy that operating systems and many legacy application might expect.
+        It is useful when muliple servers or applications need shared access to the same files through a standadized file system interface.
+        - Block Storage - Storage is preserved as raw disk block, giving applications direct control over how data is organized. This delivers high performance and low latency required by databases, virtual machines, and other IO Intensive workloads
+    
+#### Storage Properties
+    Durability - Data persists even after failure
+    Availability - Data can be accessed when needed
+    Consistancy - Every read returns the most recent write
+    (Optional)Atomacity - Operations are all or nothing (relevent in transcational storage)
+
+#### Tradeoffs in storage system
+    Scalability vs Reliability vs Performance
+        Scale(can handle growth)
+        Reliability(resistant to failure)
+        Performance(speed of reads/writes)
+    Explanation:
+        At high level architects often balances this scalibilty, reliability, performance.
+        For example: Replicating data across muliple servers improves Reliability, but it can introduce additional latency and reduce write performance.
+        Optimizing for extermely low latency access might require keeping data closer to user, but that can make consistance and realiability harder to maintain at scale.
+        A banking application may priortize reliability and consistance over raw speed, while a social media feed may prioritize scalabilty and responsiveness.
+### The CAP Theorem
+    CAP Theorem is mainly about: 
+        Partition Tolerance is not really optional in large scale distributed systems.
+            Network fail, links breaks, and regions become temporarly isolated. Since partitions are inevitable, realworld systems are effectively choosing between consistancy and avaliability during thos failures
+
+    In a full distributed system, you can only gurantee 2 of the 3
+        - Consistancy - Every read gets the latest write
+        - Availability - Every request recives a response
+        - Partition Tolerance - System continous dispite network failures
+        No system can have all 3 all the same time
+    Note: Since network partitions are unavoidable, especially at scale, real world systems must choose between Consistancy and Availability during a partition.
+
+    Explanation:
+        CAP tells when a distributed system experiences network partition, meaning some nodes can no longer communicate reliably, you cannot gurantee both perfect consistancy and full availability.
+        - Consistancy: Means every users see the latest commited data regardless of which node they are connected to.
+        - Availibity: Means every request receives a response, even if some parts of the system are experiencing the issues.
+        - Partion Tolerance: Means That the system continously operating despite network failures between nodes.
+        Partition Tolerance is not really optional in large scale distributed systems.
+        Network fail, links breaks, and regions become temporarly isolated. Since partitions are inevitable, realworld systems are effectively choosing between consistancy and avaliability during thos failures
+        For example banking system may favor consistancy, preferring to reject requests rather than risk showing incorrect account balance.
+        A social media feed, on the other hand, might favour availibility, allowing users to continue interacting even if some data is temporarly stale.
+        Under normal conditions systems provide both consistancy and availability.
+        The tradeoff only occurs when a network partition occurs.
+        CAP is ultimatly about how a system behaves during failure, not when everything is working perfectly.
+
+#### Types of systems Based on CAP trade offs
+    CP(Consistancy + Partition Tolerance)
+        Prioritize data correctness over availability
+        During a partition, the system may reject requests to avoid inconsistant reads
+        Not always available, but when it is - data is guranted to be correct
+        Example: HBase: Strongly consistent. If a node cant confirm a write across replica, it wont serve it - even if it means being unavailable briefly.
+        When to use: Financial systems, banking apps, anything where data integrity is critical
+    AP(Avalibility + Parition Tolerance):
+        Prioritizes system uptime over consistancy
+        During a partition, the system will serve requests,even if they return stale or eventually consistant data
+        Example: Dynamo Db: Inspried by Amazon Dynamo Model, which uses eventual consistancy by default for high availability
+        When to use: Social media feeds, product catalogs, content delivery - where being up is more important than perfect accuracy
+    CA(Consistancy + Availibility):
+        Only possible if no network partitions ever occur - i.e, in single node or tightly coupled systems
+        In practise, not archievable in distributed systems that need to tolerate network faults
+        Example: Relational databases(like postgresql) is standalone mode(not distributed) could be considered as CA
+    
+    Explanation:
+        CP: This systems prioritize data correctness above every thing, During network partition they may refuse reads or writes rather than risk returing incorrect data.
+        From users perspective the system might appear temporarly unavailable. But the data you do recieve is guranted to be correct.
+        AP: This systems choose to remain operational even when parts of the network cannot communicate, Networks continous recieving responses but some of those responses may remain stale util replicas syncronize data
+        This tradeoff's works well for workloads like social media posts, product catalogs, recommendation and content platforms where a slightly outdated response is usually acceptable
+        CA: In theory this systems provide both correct and continous availability. The catch is that this only work when network partitions doesnot occur, since network partitions are evitble, it truly works at single node system or tightly coupled deployment rather than large scale distributed architectures.
+        
 
 
 
