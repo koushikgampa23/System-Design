@@ -1710,7 +1710,11 @@ This Repo contains system design
             Use lifecycle rules for archieving/deletion
             Monitor usage and optimize classes
 
-
-
+### File system and distributed storage
+    What is a file system?
+        Defines how data is stored and retrived on disk
+        Example: ext4, NTFS, XFS
+    Handles file metadata, directories, permissions
+    
 
 
