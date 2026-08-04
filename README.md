@@ -1664,6 +1664,52 @@ This Repo contains system design
     
     All ways start with one database when possible, and introduce additional data stores only when a clear scalability, performance, or business requirement justifies the added complexity
 
+### Object Storage in Modern systems
+    What is object storage?
+        A storage architecture that manages data as objects, not files or blocks
+        Each object contains:
+            Data itself
+            A unique identifier(key)
+            Metadata
+    Unlike traditional storage, it is scalable, distributed and suited for unstructured data
+
+    Explanation:
+        The key idea is that data is stored as a self contained objects rather tha files organized in folders or blocks attached to disks
+        Every object combines the actual data, a unique identifier used for retrivel and rich metadata that describes the object and how it should be managed
+        This design becomes incredibly powerful at scale because the storage system no longer depends on traditional directory strucuture or fixed volumes
+        Instead object lives in namespace and can be distributed across thousands of servers transparently.
+        That is why object storage became the default choice for storing massive amounts of unstructured data like images, videos, documents, backups, logs and data lake content
+    
+    Key concepts in Object storage:
+        Object: self contained unit of data
+        Bucket: Logical container for storing objects(like folders)
+        Metadata: Custom data that describes the object (eg:MIME type, timestamp, custom tags)
+    
+    Explanation:
+        Metadata stores beyond basic data like content type, size and timestamp it also stores application specific attributes like ownership, project information, rentension polices, or access classification
+        This additional information allows applications to search, automate,secure and manage data much more intelligently
+
+    Popular Object storage platforms
+    Amazon S3: industry standard, rich ecosystem, high durability
+    Google Cloud Storage(GCS): Simplified tiers, ML friendly
+    Azure Blob storage: Strong integration with microsoft stack
+    On prem alternatives(MinIO) of hybrid or cloud native use
+
+    Since object storage can serve files directly over HTTP, it becomes a simple and very cost effective way to host frontend applications, document sites, landing pages, and content portals with out managing webservers
+
+#### Important considerations with object storage
+    Performance considerations:
+        Latency: Object storage has higher latency than block/file
+        Throughput: Designed for massive parallel access
+        Consistance: Eventual consistancy in some platforms(eg: s3)
+        Access pattern: Suited for write once, read many workloads
+    Cost considerations:
+        Storage class tiers: Standard, infrequent Access, Archieve(S3 Glacier)
+        Charges: Storage, request(GET/PUT), egress bandwidth
+        Best practises:
+            Use lifecycle rules for archieving/deletion
+            Monitor usage and optimize classes
+
 
 
 
