@@ -1630,17 +1630,17 @@ This Repo contains system design
         Once data is distributed, the system must determine where the data live, route requests to the correct shard and handle operations that span across multiple shards
         That adds significant architectural complexity
 #### Sharding strategies
-    Range Based Sharding
+    1.Range Based Sharding
         Split by value ranges(e.g: user_id=1-1000)
         Can create hot spots
-    Hash based sharding
+    2.Hash based sharding
         Distribute using a hash function
         Even distribution but harder to query ranges
-    Consistent Hashing for resilient hash based sharding
+    3.Consistent Hashing for resilient hash based sharding
         Traditional hashing breaks when nodes are added/removed
         Consistent hashing solves this: only a subset of keys needed to be remapped when topology changes
         Enables better elasticity and fault tolerance
-    Geo based Sharding
+    4.Geo based Sharding
         Shard by user region/location
         Useful in geo distributed systems
     
@@ -1651,6 +1651,19 @@ This Repo contains system design
         The tradeoff is that data losses natural ordering, making range based queries more complex and often requiring requests to multiple shards
         When a node added or deleted, it forces large amounts of data to be redistributed
         Consistent hasing designed to solve this problem: only a subset of keys needed to be remapped when topology changes
+    
+#### Polyglot Persistance
+    Using different types of databases for different kind of components/services
+    why: Each db excels at different things(search, analytics, relations)
+    Benefits:
+        Better performance
+        Optimized storage and queries
+    
+    Multiple databases means multiple technologies to manage, monitor, secure, backup and maintain
+    The goal is to solve different data challenges with most appropriate technology
+    
+    All ways start with one database when possible, and introduce additional data stores only when a clear scalability, performance, or business requirement justifies the added complexity
+
 
 
 
