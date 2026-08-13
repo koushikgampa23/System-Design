@@ -1743,6 +1743,7 @@ This Repo contains system design
         Capacity: Amount of work handled
         Efficiency: Resource usage under load
     Performance is not a single metric - its multidimentional goal
+    performance = speed, efficency and scalability under load
 
 #### Latency vs throughput
     latency
@@ -1844,7 +1845,65 @@ This Repo contains system design
     Monitoring is about detecting problems early
     A well monitored system allows teams to move from reactive firefighting to proactive operations, identifying performance issues before they impact customers and business outcomes
 
-### 
+### Caching for speed optimization
+#### Why caching matters?
+    Reduces latency by avoiding expensive recomputation or data retrieval
+    Eases load on backend services and databases
+    Improves user experience and system scalabilty
+    Critical in low latency, high throughput architectures
+
+    Explanation:
+        Caching becomes important when system starts doing a same expensive work repeatedly, Evey db call, API call, or computation adds latency and at scale, this ms accumulate into a poor user experience
+        Frequently accessed data can be directly served from the memory rather than API call or db call
+        That is why search suggestions, social media feeds, product catalog, and user profiles often feel instant
+        By serving large amounts of requests from cache, you dramatically reduce database load, increase throughput and delay costly scaling efforts
+        Caching increases system scalability
+        A system that handles 10k requests per second without cache, caching might support times that volume once cache hit rates become high
+        In many large scale applications, the cache obsorbs the majority of read traffic, while backend systems only handles the cache misses
+#### Types of caching
+    Client-side: Browser Memory(eg: localstorage, service workers)
+    Server-side: Application level memory or in memory caches like redis
+    CDN caching: Static content cached close to users(eg: Cloudflare, Akamai)
+    Database caching: Result-set caching, materailized views
+
+#### Caching Strategies
+    Write-Though: Write to cache and DB simultaneously
+        Data is written and updated simentanoulsy on both cache and the db
+    Write-back(write behind): Write to cache, db is updated asyncronously
+        Data is first written to cache and then asyncronously to the db
+    lazy loading(Cache-aside): Cache is populated only on demand
+        Data is explicitly fetched and stored in cache by the application when necessary
+    Explicit/manual caching: Developer decides when to cache or evict
+
+#### Cache Eviction policies
+    LRU(Least Recently Used): Remove least recently accessed item
+        1m ago, 10 min ago, 1 hour ago, 10 hour ago - Remove 10 hour ago content since last access time is 10 hours ago
+    LFU(Least Frequently Used): Remove least used item by count
+        reel 1 - 300 times, reel 2 - 600 times, reel 3 - 1000 times - remove reel 1 least frequently seen
+    FIFO(First In, First Out): Remove oldest item added
+    TTL(Time to Live): Automatically expires items after a fixed time duration
+
+#### Redis Overview
+    In-memory key-value store for ultra-fast access
+    Supports TTLs(Time to Live), persistance, pub/sub
+    Used for caching, queues, sessions, leaderboards, etc
+    Open source, widely adopted
+
+    Explanation:
+        It solves the issue accessing data at scale
+        While databases are optimized for durabilty and complex queries, Redis is optimized for speed.
+        By keeping data in memory, it can serve requests in microseconds, making it ideal for performance critical workloads
+        Pub/sub enables light weight event driven communication between services, and it has persistance options that provides balance between speed and durabilty when data needs to service the survive restart
+        Redis oftens appears in multiple places within same architecture, It can sit in front of db as cache, it can act as session store of the web application, It can power background job queues, or it can maintain realtime counters and leaderboards where fast updates are very essential
+        The operational overhead is relatively very low, and virtually every major platform offers managed redis services
+        When needed high performance layer architects choose redis
+#### Real world caching examples
+    CDN: Cache Static assests(image, JS, css)
+    Product Page data: Cache popular catalog queries
+    User sessions: Stored in redis for fast access
+    Search Results: Frequently repeated queries cached
+    API response caching: Microservices avoid recomputations
+    
 
 
 
