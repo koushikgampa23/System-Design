@@ -1716,5 +1716,25 @@ This Repo contains system design
         Example: ext4, NTFS, XFS
     Handles file metadata, directories, permissions
     
+    Key characteristics of Traditional file system?
+        Hierarchical structure(folders/files)
+        Limited scalability across machines
+        Suited for single node systems
+        use cases: Personal devices, small servers
+#### What is distributed file system(DFS)?
+    Allows file access across multiple nodes
+    Ensures redundancy, fault tolerance
+    Appears as a single file system to the user
+    Key benefits: Scalability and reliability
+    Example:
+        HDFS(Hadoop Distributed File System) - Big data analytics
+    Use cases:
+        Big data analytics(eg: Hadoop, spark)
+        Enterprise Storage(shared file system)
+        Scientific Computing
+        Media and backup systems
+
+## Performance Concepts, tools and technique
+        
 
 
