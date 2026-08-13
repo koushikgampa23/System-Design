@@ -1903,7 +1903,33 @@ This Repo contains system design
     User sessions: Stored in redis for fast access
     Search Results: Frequently repeated queries cached
     API response caching: Microservices avoid recomputations
+
+### Messaging and Queues for decoupling
+    Why use Asynchronous Messaging?
+        Loose Coupling: Decouple products from consumers
+        Improved Performance: Producers dont block waiting for consumers
+        Scalability: Consumers can scale independently
+        Resilience: Message durability adds fault tolerance
+            If a consumer is unavailable, messages can remain in queue and can be processed later instead of being lost.
+        Flexibility: Easily add new consumers without changing producers
+
+    Explanation:
+        As business requirements grow, we can add new consumers for analytics, notifications, auditing or any other use case without changing the producer.
+#### Key components of messaging system
+    Message: A data packet sent from producer to consumer
+    Producer: Sends the message
+    Consumer: Receives and processes the message
+    Broker/Queue: Stores and delivers messages
+    Topic/Queue: Logical channel for message delivery
+    Ack: Acknowledgement of successfull processing
+        
+    ![alt text](tcsglobal.udemy.com_course_mastering-system-design-from-basics-to-cracking-interviews_learn_lecture_49601085.png)
+
+#### When to use queues in architecture
+    When work loads are bursty
+    When you need decoupling between services
+    For background jobs(eg: email, processing, exports)
+    For rate limited or expensive operations
+    To buffer spike in traffic
     
-
-
 
