@@ -1735,6 +1735,116 @@ This Repo contains system design
         Media and backup systems
 
 ## Performance Concepts, tools and technique
-        
+### Introduction to system performance
+#### What is performance in system design?
+    Performance = how efficiently a system meets its functionality requirements under load
+    Key dimentions:
+        Speed: Time to respond
+        Capacity: Amount of work handled
+        Efficiency: Resource usage under load
+    Performance is not a single metric - its multidimentional goal
+
+#### Latency vs throughput
+    latency
+        Time taken to process one request
+        Measured in ms or s
+        Affects responsiveness
+    Throughput
+        Number of requests processed per second
+        Measured in RPS or TPS
+        Affects scalability
+    Low latency != High Throughput and vica versa
+    Both must be balanced based on use case
+
+    Use case:
+        Gaming industries optimizes latency each ms is important
+        Large scale analytics, and batch processing platforms are typically focused on maximizing the throughput
+
+    Explanation:
+        latency is the waiting time between the request and response
+        Throughput is how much work can the system handle over time?, it measures volume of requests or transcations processed per second
+
+        A system might deliver very low latency for a small number of users, but struggle when traffic increases
+        A system optimized for a massive through put may process huge volumes of requests while individual requests may take longer time to complete
+        We rarly optimize single metrix
+#### Scalabilty vs Responsiveness
+    Scalability: Ability to handle increased load without performance degradation
+        Horizontal vs vertical scaling
+    Responsiveness: Systems ability to respond quickly
+        Tightly linked to latency
+    Good design should ensure responsiveness at scale
+
+#### Measuring Performance
+    Performance must be measurable and trackable
+        SLA(Service Level Agreement): External Contractual guarantee
+        SLO(Service Level Objective): Internal target
+        SLI(Service Level Indicator): Actual Metric value
+    Example:
+        SLA: 99.9% uptime
+        SLO: 95% of requests < 300ms
+        SLI: Actual measurements(eg: 93% of requests < 300 ms)
+    
+    Explanation:
+        SLA: Represents commitment made to the customer or client
+        It defins level of service the business promises to deliver and it is often tied to contractual obligations
+        SLO: Sits inside the engineering organization, it translates business expectations into concrete operational targets, things such as response time, avalibity or error rates
+        SLOs give teams a measurable benchmarks for sucess and help to prioritize reliability of their work
+        SLI: is an actual measurement collected from the system. It tells what is happening in production right now
+        By comparing SLI against SLO, engineers can quickly determine wheather the system is meeting expectations or drifting towards a problem
+
+        For example:
+            A company might promise 99.9% uptime through a SLA, define an internal SLO that 95% of the requests complete within 300ms and then monitor SLIs to see wheather real world performance is meeting those targets or not
+            SLA is a promise, SLO is the goal, SLI is the reality of the system
+#### Understanding percentiles
+    Mean/Average != useful in tail-latency-sensitive applications
+    Percentiles provides better insights
+        P50: median
+        P95: 95% requests faster than this
+        P99: Tail latency - critical for user experience
+    Track tail latencies for real world performance insights
+
+    50% Requests -> 45% Requests -> 4% Requests -> 1% Slowest
+      <=P50          P50 -> P95      P95 -> P99      Tail latency
+    
+    Production system often monitor P95 and P99 systems along with average
+
+#### Why performance matters in Modern applications
+    Users expect instantaneous responses(esp. mobile/web)
+    Poor performance lead to:
+        Drop-offs and bounce rates
+        Loss in revenue
+        System instability under load
+    Performance is not a feature, not an afterthrought
+    Impacts user experience, cost and reputation
+
+    Explanation:
+        Users rarely notice when a application is fast but immediatly notice when application is slow
+        Slow applications lead to abandoned shopping carts, reduced engagements, lower conversion rate and higher bounce rate
+        Even if functionality is correct, users often percieve a slow application as unreliable
+        As traffic grows inefficient system consums more CPUs, memory, storage and network resources increading infrastructure cost while reducing stability
+
+#### Performance Testing overview
+    Types of performance Testing:
+        Load testing: Normal load conditions
+        Stress Testing: Beyond normal limits
+        Spike Testing: Sudden large load
+        Endurance Testing: Over extended time
+    Goals:
+        Identify bottlenecks
+        Ensure realiabilty under real world scenarios
+#### Introduction to Performance monitoring
+    Monitoring != Testing - its continous
+    Key tools
+        APM(eg: New relic, datadog)
+        Logs and metrics(eg: ELK, promotheses + grafana)
+    Track:
+        latency and throughput
+        Error rates
+        Resource usage(CPU, memory, DB queries)
+    Monitoring is about detecting problems early
+    A well monitored system allows teams to move from reactive firefighting to proactive operations, identifying performance issues before they impact customers and business outcomes
+
+### 
+
 
 
