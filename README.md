@@ -1975,4 +1975,110 @@ This Repo contains system design
     Kafka excels at high throughput event streming
 
 ### Concurrency and Parallelism
+    What is concurrency?
+        Defination: Concurrency is when multiple tasks start, run, and complete in overlapping time periods - not necessary simultaneously
+        KeyPoints:
+            Its about managening multiple tasks efficiently, espically on single CPU core
+            It all about task management
+            Can happen on single core
+            Goal is responsiveness
+        Example: web server handling mulitple incoming HTTP requests using asyncronous I/O
+    What is parallelism?
+        Definition: Parallism is when multiple tasks are executed simentanously, typically on multiple CPU cores
+        KeyPoints:
+            Its about actual simentanous execution to speed up performance
+            Its all about task execution
+            Needs multiple core for true parallelism
+            Goal is speed/throughput
+        Example: Matrix computation where different parts are calculated in parallel on multiple threads
     
+    Explanation:
+        Concurency is main about managing multiple tasks efficiecntly even with a single cpu core
+        A system can make progress on several tasks by switching between them.
+        The main objectve is to make it responsive
+        A webserver handles 1000s of requests using async io, while on request is waiting for db or network call, the server can work on other request instead of sitting idle.
+        
+        Parallelism is all about execution, multiple tasks run at the same time on different cpu cores, The goal is not responsiveness it is about throughput and speed. When processing large datasets, rendering graphics, traning machine learning models
+        Parallelism allows you to divide the work and execute those pieces simentanously
+
+        A web application might use concurrency to manage multiple requests, while using parallelism behind the scenes to complete the cpu intensive work
+    
+#### Processes vs Threads
+    Processes:
+        Have their own memory space
+        Heavier to create and switch
+        Isolated and clear
+    Threads:
+        Share memory within the process
+        Lightweight and faster
+        Can lead to complex bugs(eg: race conditions)
+    Explanation:
+        A process is a self contained application with its own process space and resources, because every thing is isolated, processes provide strong fault boundaries. if one processes crashes , the operating system can terminate it without bringing down other processes
+        This isolation improves reliability and security
+        Creating a process, allocating space and switching them is more expensive.
+
+        Multiple threads live within same process and share same memory space, because they take same memory, creating and switching between threads is much faster this is why it used in concurrency
+
+        Processes are optimized for isolation and safety, while threads are optimized for performance and resource efficiency. 
+#### Thread Pools and worker models
+    Thread Pools
+        Pre created threads reused for multiple tasks
+        Avoid overhead of creating/destroying threads
+    Worker Models
+        Tasks are distributed to idle workers from a shared queue
+        Improves scalability and CPU utilization
+    Exampl:
+        ASP.NET Core uses thread pool to handle requests efficiently
+    
+    Explanation:
+        Instead of creating new thread for every piece of work, the system maintains pool of threads that are reused repeatedly. When a task arrives, an available thread picks it up, executes it, and returns to the pool for the next task. Reusing the thread is half the work. we also need a way to distribute the work. 
+        Rather than assigning work directly to a specific thread, tasks are placed in a shared queue, Idle workers continous pull tasks from that queue and process them. This Created natural load balancing and keeps cpu resources busy
+
+        Thread model is optimized for resource optimization and work model is optimized for task distribution and together they form the foundation of scalable high throughputsystems.
+    
+#### Asychronous Processing
+    Why Async?
+        Avoid blocking threads on I/O
+        Improve throughput
+    Techniques:
+        Async/await
+        Promises and futures
+        Messaging Queues(eg: RabbitMQ, Kafka) for background work
+#### Concurrency in Web servers
+    Traditional Servers(eg: Apache):
+        Spawn new thread/process per request
+        Not scalable for high traffic
+    Modern servers(eg: Node js, ASP.NET core, Ngnix):
+        Use async/non-blocking I/O
+        Event loop or thread-pool for scalability
+
+    Explanation:
+        Early web server followed simple model. Every incoming request received its own thread or own process. This is straight forward to implement because each request has dedicated resource and could be handled independently
+        The problem emerged when traffic grows, Thousands of threads leading to high memory consumption, excessive context switching and eventually a degraded performance
+
+        Modern systems instead of dedicating each thread to new request they use async non-blocking io, when a request is waiting for db call or network call or external api call, the server doesnot keep the thread idle, the thread is immediatly reused by the other work.
+
+        Node js uses event loop that efficiently coordinatie large number of IO operations with small number of threads, asp .net uses thread pool
+        While ngnix uses event driven architecture optimized for handing massive number of concurrent connections.
+
+        Modern servers dont scale by creating more threads, They scale by reducing the waiting. By keeping threads busy and minimizing resource overhead
+#### Common Pitfalls
+    Race Conditions:
+        Multiple thread access and modify shared data concurrently
+        Causes unexpected behaviour or corruption
+    Preventing Race conditions requires Syncronization mechanisms such as locks, mutexes, atomic operations, or designing systems to minimize shared state
+
+    Deadlocks:
+        Two or more resources wait for each other to release resources
+        System gets stuck indefinitly
+    Acquiring resources in a consistant order, keeping locks for the shortest possible time, reducing shared mutable state, and using timeouts to detect and recover from waiting independently
+#### Best practises and realworld examples
+    Prefer async/non-blocking io for i/o bound tasks
+    Use thread pools instead of raw threads
+    Always syncronize access to shared data(locks, mutexes, etc)
+    Detect and avoid dead locks(lock ordering and timout strategies)
+    Real world Examples:
+        Web server handling 1000s of requests: Uses Thread pool + async IO
+        Background job processing(Email Queue): Worker model with rabbitMQ
+        Parallel Image Rendering: Each Frame rendered on a different core
+        
