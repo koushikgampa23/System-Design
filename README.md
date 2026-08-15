@@ -1932,4 +1932,47 @@ This Repo contains system design
     For rate limited or expensive operations
     To buffer spike in traffic
     
+    Explanation:
+        A practical rule, when ever can be delayed, retried or processed independently, a queue is often the simplest way to improve scalability, resilience and the overall systems stability.
 
+#### Delivery Gurantees
+    At-Least-Once(default in many systems)
+        Message is retried until acknowledged
+        May lead to duplicates
+        Consumers must be idempotent
+    At-most-once
+        Message sent only once
+        No retries -> may result in message loss
+    Exactly-Once
+        Guranteed single delivery without duplicates
+        Complex and more resource heavy
+        Kakfa supports it under specific constraints
+    
+    Explanation:
+        In At least once model, if the broker doesnot receive acknowledgement it assumes something went wrong and then retries the message. This greatly reduces the risk of message loss, but introduces the possibility of duplicates.
+#### Common use cases of Messaging Queues
+    Order processing
+        Decouple frontend from inventory, payments and shipping
+    Logging and monitoring
+        Centralized log processing(eg: ELK, kafka)
+    Rate limiting/ Traffic shaping
+        Queue incoming requests and process at a safe pace
+    Email/SMS notification system
+        Queue user notifications for async sending
+    ETL pipelines/Stream processing
+        Kafka used for realtime data transformation
+#### Best practises to use message queues
+    Use idempotent consumers
+    Implement dead letter queues(DLQs)
+    Monitor queue length and processing time
+    Handle retries and failures gracefully
+    Choose delivery semantics based on need
+    Secure your message brokers(auth, encryption)
+#### Summary
+    Asyncronous messing helps build scalable and decoupled systems
+    Use queues when real time response is not necessary
+    RabbitMQ is great for traditional queues
+    Kafka excels at high throughput event streming
+
+### Concurrency and Parallelism
+    
