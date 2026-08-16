@@ -2081,4 +2081,69 @@ This Repo contains system design
         Web server handling 1000s of requests: Uses Thread pool + async IO
         Background job processing(Email Queue): Worker model with rabbitMQ
         Parallel Image Rendering: Each Frame rendered on a different core
-        
+### Database performance optimization techniques
+#### Indexes: Types and usecases
+    What are indexes?
+        Definition: Data structures that improve query performance by reducing the amount of data scanned
+    Types of Indexes:
+        B-Tree Indexes: Common for exact match and range query
+        Hash Indexes: Best for equality comparision
+        Full-Text Indexes: Used for searching large textual data
+        Bitmap Indexes: Suitable for low cardinality data
+    When to use indexes:
+        Read-heavy operations: Indexes speed up query performance
+        Write-heavy systems: Be cautions, as indexes might slow down inserts and updates.
+
+        Each Index improves read performance but also increases storage and adds overhead during writes, Because the index must be updated whenever data changes
+    
+#### Normalization and denormalization
+    Normalization:
+        Goal: Reduce data redundancy by organizing data into tables.
+        Benefits: Minimizes storage cost, eliminates anomalies.
+        Drawbacks: Can lead to complex joins and slower read performance
+    Denormalization:
+        Goal: Introduce redundancy to reduce join operations and speed up reads
+        Benefits: Faster read performance
+        Drawbacks: Increased storage and potential data anomalies.
+    When to use each:
+        Normalization: Transcational systems(OLTP)
+        Denormalization: For reporting systems or read heavy workloads
+
+    Explanation:
+        Normalization focuses on organizing data into seperate, well structured tables to eliminate duplication.
+        Denormalization is the opposite approach it intentionally duplicates data to reduce number of joins during the queries
+
+#### Additional Techniques - Connection Pooling
+    What is a connection pooling?
+        Definition: A technique used to manage database connections by reusing established connections instead of creating new ones.
+    Why Use it?
+        Reduces overhead caused by frequent connection creation and teardown
+        Helps handle large number of concurrent connections effectively.
+#### Additional Techniques - Query optimization
+    Definition: The process of improving performance of SQL queries
+    Techniques:
+        Use of indexes: Leverage indexes to speed up search operations.
+        Avoiding N+1 queries: Reduces unnecessary database hits by using joins or batching queries
+        Using proper Joins: Minimize complex joins when possible
+#### Additional Techniques - Materialized Views
+    Definition: A precomputed query result stored as a table
+    Benefits:
+        Speeds up query performance by avoiding realtime computation
+        Useful in reports and data warehousing
+    Use cases:
+        Data aggregation or summary data that frequently doesnot change
+        Reporting system where fast retrivel is critical
+#### Additional Techiniques - Batching and pagination
+    Batching:
+        Definition: Sending multiple operations in a single request or transcation to reduce overhead
+        Use case: Bulk inserts or updates
+    Pagination:
+        Definition: Breaking large sets of data into smaller chunks for efficient retrival
+        Prevents large queries that could lead into timeouts or memory issues
+        Ensures responsive ui by fetching data incrementally
+#### Summary and key takeaways
+    Replication and sharding: Key techniques for database scaling across multiple servers
+    CAP theorem: Understanding trade-offs between consistancy, availiability and patition tolerance
+    Indexes: Crucial for improving query performance, but need to be managed properly
+    Normalization vs Denormalization: Choose based on work load(transcation vs reporting.)
+    Other techniques: Connection Pool, query optimization, materialized views and batching for efficient database operations
