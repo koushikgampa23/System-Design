@@ -2147,3 +2147,35 @@ This Repo contains system design
     Indexes: Crucial for improving query performance, but need to be managed properly
     Normalization vs Denormalization: Choose based on work load(transcation vs reporting.)
     Other techniques: Connection Pool, query optimization, materialized views and batching for efficient database operations
+
+## Reliability, availability and Disaster Recovery
+### Introduction to System reliability
+    Why Realiability matters?
+        Users expect system to be always available, consistant and trustworthy
+        Downtime costs money, reputation and user trust
+        High Reliability = low failure + fast recovery
+
+        Systems fail, Reliability is how gracefully they handle failures
+
+#### What is system reliability?
+    Reliability is the ability of the system to operate continously without failure
+    It includes:
+        Correctness
+        Consistancy
+        Fault tolerance
+        Uptime
+    
+    Key metrics - MTBF, MTTR
+    MTBF - Mean Time Between Failures - Avg time a system work before failing(in simple how long a system works before experiencing failure)
+    MTTR - Mean Time to recovery - Avg time to recover from failure
+
+    High MTBF + Low MTTR = High Reliability
+
+    What are SLAs?
+        SLAs are contractual gurantees about system performance
+        Common SLA metrics:
+            Availibility(99.9%)
+            Response time
+            Error Rate
+        99.9% uptime =~ 8.76 hours of downtime/year
+    
