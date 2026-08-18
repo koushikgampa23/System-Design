@@ -2271,8 +2271,60 @@ This Repo contains system design
         Commonly used in cloud environments for fault tolerance
 
 #### Summary and key takeaways
-    High 
+    High availability ensures systems remain operational even in the event of failures through redundancy and failover
+    Fault tolerance involves designing systems to continue functioning despite partial failures, using strategies like N+1 redundancy and graceful degradataion
+    Failover systems provide automatic switching to backup systems to maintain service avaliability.
+    Load balancers play a crucial role in distributing traffic and ensuring HA across servers
+    Health monitoring and self healing systems are critical for ensuring that systems detect failures and recover autonomously
+    Designing systems with redundancy and resilience is essential to ensure availbility and performance
 
+### Backup and recovery strategies
+    Backup: Creating copyies of data to protect against data loss
+    Recovery: Restoring data from backups after failure or corruption
+    Critical for disaster recovery, ransomware protection, hardware failures
+    Complements replication and redundancy
 
-            
+    Why backup is important?
+        Hardware or software failure
+        Human Error(accidental deletion)
+        Cyber attacks(ransomeware)
+        Natural disasters
+        Compliance and data retension
+
+    Types of backup
+        Full backup
+            Copies all data
+            Simple recovery
+            high storage cost and time
+        Incremental Backup
+            Backup only changes since last backup
+            small, fast, but needs all increments to restore
+        Differential backup
+            Backs up changes since last full backup
+            Bigger than incremental, faster restore
+    Recovery types
+        Cold recovery
+            Backups stored offline
+            high downtime and low cost
+        Warm recovery
+            Some resources are pre provisioned
+            Moderate downtime and cost
+        Hot recovery
+            Fully redundant, always ready
+            Minimal downtime, highest cost
+
+    Understanding RTO and RPO
+        RTO(Recovery Time Objective):
+            How quickly can system recover?
+        RPO(Recovery Point Objective):
+            How much data loss is acceptable?
+        Shorter RTO/RPO = Higher cost & Complexity
+
+    Tradeoffs in Backup strategy
+        Cost vs Recovery speed
+        Complexity of manageing backup frequency and retension
+        Balance based on:
+            Business criticality
+            Compliance needs
+            Infrastructure maturity 
 
