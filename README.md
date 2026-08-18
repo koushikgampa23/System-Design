@@ -2179,3 +2179,100 @@ This Repo contains system design
             Error Rate
         99.9% uptime =~ 8.76 hours of downtime/year
     
+    Availability vs durability
+        Availability: System is accessible and responsive
+        Durability: Data is safe and not lost
+    Avalibilty protects users experience where as durability protects users data.
+
+#### Impact of Reliability on System Design
+    Design decisions that affect reliability:
+        Redundancy(multiple instances, failover)
+        Health checks and monitoring
+        Retry mechanism and circuit breakers
+        Distributed desgin patterns(replication, quorum)
+    
+    Reliabilty in Distributed system
+        Challenges:
+            Network partitions
+            Node failures
+            Eventual Consistancy
+        Solutions:
+            Use CAP-aware design
+            Ensure failure isolation
+            Implement replication, and consensus algorithm(eg. Paxos and Raft algorithms)
+
+#### Summary and key takeaways
+    Reliability is foundation to user trust
+    Metrics like MTBF, MTTR, SLAs are vital to quantify it
+    Design choices must anticipate and tolerate failure
+    In distributed/cloud systems, reliability is an active design challenge
+
+### High availability, Fault tolerance, and failover
+    Redundancy and Redundancy Strategies
+        Redundancy is crutical to ensure system avaliability and reliability
+        Purpose: Prevent single point of failure
+        Types of Redundancy:
+            Hardware(servers, storage)
+            Network(network routes, paths)
+            Services(Microservices, databases)
+    N+1, Active-Active, Active-passive
+        N+1 Redundancy: One Extra instance(eg: 3 instance for 2 required)
+                        Ensures avaliability incase of failure
+        Active-Active: Multiple nodes work together, each handling requests
+                       High availability and load distribution
+        Active-passive: One active node, others are standby, only activated on failure
+                        Simpiler but less efficient for load balancing
+
+        Explanation:
+            N+1: Always add one extra instance to the minimum required instance.
+            Common in infrastrure, databases and networking equipments
+            
+            Active-Active: Multiple nodes servers requests simultanously with a load balancer distributing traffic across them.
+            If one node fails, then the request is simply rerounted to healthy nodes
+            Tradeoff is greater operational complexicity, since data sessions and state may need to remain syscronozied across multiple active instances
+
+            Active-passive: It is widly used in disaster recovery and databases
+    Graceful Degradation
+        Graceful Degradation: System still operates at a reduced capacity during failures
+                            Example: During high traffic, disable non essential features
+        Helps maintain user experience even when full service is not possible
+        Critical for ensuring users still benefit from some functionlity during outages
+        
+        Explanation:
+            The better strategy is to keep most important functionality running while temporarly sacrificing less critical features.
+            This design priciple is know as graceful degradation
+        Example:
+            Consider a ecommerce application during black friday sale, suppose recommendation service becomes unavailable or overloaded.
+            Rather than impacting the failure to the entire website, the application simply hides the recommendation section, while keeping products browsing, shooping cart and checkout fully operational.
+            
+            You protect the revenue generating path, while temporarly disabiling the non essential feature.
+            A parital functional application is always better than an application that is completely unavailable
+#### High Avaliability patterns in real world systems
+    Load balancers:
+        Distibute traffic evenly across healthy nodes
+        Essential for active-active configuration
+    Replication:
+        Copy data across multiple nodes or data centers for avalibility
+    Failover:
+        Health checks determines failures
+        Automatically switch to a backup node/service in case of failure
+
+#### Designing for Redundancy
+    Redundant Components: Design with multiple instances of key components(servers, databases,etc) to avoid failure
+    Geographical Redundancy: Use multiple data centers or cloud regions for disaster recovery
+    Automated failover: Ensure failover happens without manual intervension
+
+#### Health monitoring and self healing systems
+    Health Monitoring:
+        Track the status of system components(eg: servers, services)
+        Alerts for system failures or performance degradataion
+    Self healing Systems:
+        Automatically repair or replace failed components
+        Commonly used in cloud environments for fault tolerance
+
+#### Summary and key takeaways
+    High 
+
+
+            
+
