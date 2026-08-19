@@ -2532,3 +2532,22 @@ This Repo contains system design
     Common authentication methods include Basic, OAuth2, OpenID Connect, and JWT
     Access Control Models include RBAC, ABAC, DAC and MAC
     SSO and identity federation simplifies user authencation across multiple platforms.
+
+### Data protection and Secure communication
+    Why data protection matters
+        Gowing threats: breaches, Man-in-the-attacks, data leaks
+        Regulations(GDPR, HIPAA, etc.)
+        User trust and system reliability
+    
+    Explanation:
+        A single vulnerability can expose customer records, financial data or confidential business information.
+        Security is also a legal responsibility.
+        Regulations lik GDPR, HIPAA define how organizations must collect, store, process and protect sensitive data
+        Failing to meet those requirements is not just a technical issue, it can actually result in significant financial penalties, legal consequences and reputational damage.
+    
+    Encryption
+        what is encrption?
+        plain text -> Cipher text -> Decryption
+        Key = Secret for decoding and encoding
+    
+    
