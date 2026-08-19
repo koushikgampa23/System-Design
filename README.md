@@ -2326,5 +2326,66 @@ This Repo contains system design
         Balance based on:
             Business criticality
             Compliance needs
-            Infrastructure maturity 
+            Infrastructure maturity
+
+    Best practises
+        Automate backups and testing of restores
+        Encrypt backups at rest and in transit
+        Monitor backups success and failure
+        Apply 3-2-1 rule:
+            3 copies of data
+            2 different mediums/storages
+            1 offsite
+#### Summary and takeaways
+    Backups are vital for disaster recovery and resilience
+    Choose the right backup type and recovery model
+    Under RTO/RPO goals
+    Cloud solutions simplify but require governance
+    Regular testing is key
+
+### Disaster recovery in Practise
+    why disaster recovery matters?
+        Disaster recovery is something that ensures that the business can continue operating when something goes seriously wrong, not just recovering lost data
+        While backups help restore information, they dont gurantee that our application, infrastructure, and services will be back online quickly.
+        For mission-critical systems even a short outage can lead to significant financial losses, disrupted operations and damaged customer trust.
+        Protects against outages, data loss, and cyber attacks
+        Compliments backup strategies with full system level reslience
+    
+    DR for mission critical application
+        Systems must meet RTO and RPO targets
+        Requires redundancy at multiple levels: compute, storage,network
+        Automated failover + tested recovery plans
+        Examples: banking, health care, e-commerce platform
+    
+    Failover + Backup = True resilence
+        Backups alone = data recovery
+        Failover = service continuity
+        Combine both:
+            Backups for corruption or deletion
+            Failover for infra or region outages
+        Include both in DR plan for full coverage
+
+    Testing and automation
+        DR plans must be regularly tested
+        Automate:
+            Failover switching
+            Data validation after restore
+            Notification and logging
+        Run DR drills: simulate failures
+        If you havent tested it, you dont have it
+
+#### Geo Redundancy and Quoram Based design
+    Geo Redundancy: Deploy across multiple physical locations
+    Quoram based design: Quoram is the minimum numbers of servers that must acknowledge a distributed operation to be successfull before it marked as success
+    This ensures:
+        Data consistancy
+        Safe failover(majority nodes available)
+    
+    Challenges in Geo Distributed systems
+        Data consistancy across regions
+        Latency during sync and failover
+        Regularity constriants(data locality)
+        Coordenating multi region failovers
+    
+    
 
