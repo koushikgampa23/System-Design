@@ -2386,6 +2386,149 @@ This Repo contains system design
         Latency during sync and failover
         Regularity constriants(data locality)
         Coordenating multi region failovers
-    
-    
+### Summary
+    Intro to system reliability
+        Reliability concepts(MTBF, MTTR, SLAs, Availabilty Vs durability)
+        The impact of reliability on system design and its role in cloud-native and distributed systems
+    High Avaliability , Fault Tolerance and Failover
+        Redundancy Strategies like N+1, active-active, active-passive
+        Graceful degradation HA patterns and designing for redunduncy with health monitoring and self healing systems
+    Backups and Recovery strategies
+        Different types of backups(Full, incremental, differential)
+        Understanding RTO/RPO and tradeoffs in backup strategies
+        Cloud based backup strategies for cost effective, scalable recovery
+    Disaster recovery in practise
+        Designing DR for mission critical applications
+        Combining backup + failover for complete reslience
+        Testing and automating recovery plans and challenges with geo distributed systems and querory based systems
+## Security in system Design - Principles, Practises and Protocals
+### Introduction to security in system design
+    Security is non-functional requirement but critical for:
+        User trust
+        Data protection
+        System reliability
+    Real world examples: Data breaches(Equifax, facebook, etc..)
 
+    What is security in distributed systems?
+        Distributed systems: more entry points, more vulnerabilities(ex: Every service, API, message queue and database connection becomes another potential entry point for attackers)
+        An architect has to think data must remain protected wheather it is moving between services or stored in database and object storage, which is why encryption both in transit and at rest is essential.
+
+        Security considerations:
+            Data in transit and at rest
+            Authentication and Authorization
+            Secure APIs and endpoints
+            Node and network level protection
+
+        The CIA Triad: Core of system Security
+            Confidentiality: Prevent unauthorized access
+            Integrity: Prevent data tampering
+            Availability: Ensure system uptime and access
+#### Threat Modeling: Understanding your advesary
+    Define potential attackers and what they want
+    Consider:
+        Attack surface
+        Entry point
+        Assest to protect
+    Tools: STRIDE model(Spoofing, Tampering, Repudiation, Info disclosure, Denial of Service, Elevation of Privilege)
+
+    Spoofing Identity:
+        The act of impersonating another user to gain unauthorized access
+    Tamporing with data:
+        Unauthorized alteration of data to disrupt or deceive
+    Repudiation:
+        The ability to deny actions taken, complicating accountability.
+    Information disclosure:
+        Unauthorized access to confidential data
+    Denial of Service:
+        Disrupting access to services or resources
+
+    Common Attack vectors
+        How attackers get in:
+            Insecure APIs
+            Misconfigured servers
+            Poor authentication
+            Open ports/services
+#### Common attacks
+    DDos(Distributed Denial of service)
+        Flooding systems with traffic to disrupt service
+        Target: Availability
+        Mitigation:
+            Rate Limiting
+            Traffic scrubbing(eg: cloud flare)
+            Autoscaling and failover strategies
+    Man-in-the-middle(MITM) Attack:
+        Attacker intercepts communication
+        Targets: Confidentiality and Integrity
+        Protection:
+            HTTPS(TLS)
+            Certificate pinning
+            VPNs
+    Injection Attacks(eg: SQL injection):
+        Attackers sends malicious input to execute unwanted commands
+        Impacts: Data integrity, confidentiality
+        Mitigation:
+            Input validation
+            Parametrized queries
+            WAF(Web application firewall)
+    Spoofing Attacks
+        Impersonation of another user/system
+        Types: IP spoofing, email spoofing, DNS spoofing
+        Defense:
+            Multi factor authentication
+            Token based authentication
+            IP whitelisting
+#### Security in the software Development lifecycle (SDLC)
+    Embeded security from the start(Shift left)
+    Phases:
+        Requirements: Threat modeling (who the attackers are and what risk the system is likely to face)
+        design: Secure architecture (principles like least privilage, defence in depth, nework segmentation)
+        Development: Secure coding (validates inputs, use safe libraries, manage dependencies and follow coding standards that reduce sql injection or css attack)
+        Testing: Security tests, fuzzing (static analysis, dynamic testing, penetration testing)
+        Depolyment: Secret management
+        Maintanence: Patch management
+#### Best practises
+    Adopt security by design
+    Use encryption(TLS, at rest)
+    Harden infrastructure(firewalls, VPCs)
+    Validate inputs and sanitize outputs
+    Monitor and log activity
+
+### Authentication and authorization
+    Authenticaion: Verifiying who user is(identity verificaiton)
+    Authoriation: Granting the user permission to access specific resources based on identity
+    Key difference:
+        Authentication is who you are, while authorization is about what you can do
+    
+    Common Authentication Methods
+        Basic Authentication: Simpler user and password based authentication
+        OAuth2: Delegated access protocal, allowing third party services to access user data without exposing credentials
+        OpenID Connect: An identity built on OAuth2 for authentication, often used for single signon (SSO)
+        JWT(Json web tokens): Commonly used in stateless applications and APIs
+    
+    Session based vs token based authentication
+        Session based Authentication:
+            Server side storage of session data, typically using cookies
+            Pros: Easy to implement, work well with traditional web applications
+            Cons: Scalability challenges in distributed systems
+        Token-based Authentication:
+            Stateless where token are used to authenticate user.
+            Pros: Scalable, decouples backend systems
+            Cons: Requires secure token storage and handling
+#### Access control Models
+    RBAC(Role Based Access Control): Assigns permissions based on user roles(eg: Admin, User, Viewer). Simpler to manage but less flexible
+    ABAC(Attribute Based Access Control): Grants access based on attributes(eg: Department, project). More fine grained but more complex
+    DAC(Discretionary Access Control): Owner of a resource defines access control
+    MAC(Mandatory Access Control): Access control made by a central authoritiy based on security policies
+
+#### SSO(Single Sign On) and identity Fedaration
+    SSO: 
+        A user authentication that allows a user to access multiple applications with a single set of credentials. 
+        Benefits: User conveninace, reduced password fatigue.
+    Identity Fedaration: 
+        A system where multiple identity providers(eg: Google, Facebook) can be used to authenticate user across different platforms
+        Benefits: Seamless user experience across different services, reduces need to create multiple accounts
+#### Summary and key takeaways
+    Authentication verifies the users identity, while authorization defines what user can access.
+    Common authentication methods include Basic, OAuth2, OpenID Connect, and JWT
+    Access Control Models include RBAC, ABAC, DAC and MAC
+    SSO and identity federation simplifies user authencation across multiple platforms.
