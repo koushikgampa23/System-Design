@@ -2550,4 +2550,18 @@ This Repo contains system design
         plain text -> Cipher text -> Decryption
         Key = Secret for decoding and encoding
     
-    
+    Encryption at rest and transit
+    Encryption at rest
+        Protects stored data(disks, databases, backups)
+        Common techniques: Full disk encryption, database-level encryption
+        Use cases: Cloud storage, user files, logs
+    Encryption at Transit
+        Secures data during transmission(eg: HTTP request/response)
+        TLS/SSL protocals enables secure communication
+        Must have for apis, user sessions
+
+    Symmetric vs Asymmetric Encryption
+        Symmetric: One key for both encyption and decryption(fast, used for large data)
+        Asymmetric: public/private key pair(secure key exchange)
+        Often used together(eg: TLS handshake)
+        
