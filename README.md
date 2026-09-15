@@ -2564,4 +2564,40 @@ This Repo contains system design
         Symmetric: One key for both encyption and decryption(fast, used for large data)
         Asymmetric: public/private key pair(secure key exchange)
         Often used together(eg: TLS handshake)
-        
+
+### TLS/SSL and HTTPS
+    HTTPS = HTTP over TLS
+    Ensures confidentiality, integrity and authenticity
+    TLS handshake: key exchange + cipher negotiation
+
+    HTTP <--- plain text ---> server
+    HTTPS <--- ENCRYPTED TEXT ---> server
+
+    Explanation:
+    TLS does more than just encrypting data, It establishes trusted and secure communication channel between client and server.
+    A secure connection must provide 3 gurantees confidentiality so that attackers cant read the data in transit, Integrity ensuring data is not modified along the way, authenticity allowing client to verify that it is communicating with legitimative server rather than an attacker improsonating it.
+
+    Before any application data is exchanged, the client and the server negotiate the cryptographic algorithm they will use, they verify servers identity through certificate, and securely establish a shared symetric session key.
+
+    Once the handshake is established, all subsequent traffic is encrypted using that symmetric key for maximum performance
+
+#### Hashing and salting passwords
+    Hashing = One way transformation
+    Use for storing passwords(not reversible)
+    Salting: add random data to prevent rainbow table attacks
+
+    Explanation:
+    Hashing is a one way cryptographic transformation, meaning when a user creates a password the application computes its hash and store hash instead of original password.
+    During login the entered password is hashed and compared with stored value.
+    Hashing alone is not enough, if 2 users chooses same password, they will produce the same hash, making it easier for attackers to use precomputed lookup tables, known as rainbow tables
+    To prevent this every password is combined with unique randomly generated salt before it is hashed.
+    As a result, identical passwords produce compelety different hashes, making large scale attacks far far less effective.
+
+    Modern systems go one step further by using password specific hashing algorithms, such as bcrypt or argon2, This algorithms automatically incorporate salting and are intentionally computationally expensive, making brute force attacks significantly lower
+
+#### PKI(Public Key Infrastructure)
+    PKI = system for managing digital certificates and keys
+    Role of certificate Authorities(CAs)
+    Digitial signatures and certificate chains
+
+    PKI are digital signatures, which bind public key to the identity of a website or organization or individual.But anyone can create a certificate, so how do clients know it is legitimate 
