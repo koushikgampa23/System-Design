@@ -2726,3 +2726,10 @@ This Repo contains system design
         Scalability and Availibility: Implement load balancing, autoscaling and replicaiton
         Performance Considerations: Focus on latency, throughput, and caching hot data
         Tradeoffs: Weight vs performance, simplicity vs complexicity in tech choices(eg: Redis for caching vs traditional databases)
+### Conclusion - The blueprint for success
+    Always start with a clear understanding of requirements and constaints
+    Use scale and bottleneck analysis to guide architectural desicions
+    Create High level design that balances performance, cost and complexity
+    Make informed infrastructure and tech choices to ensure scalability and availibility
+    ![alt text](tcsglobal.udemy.com-course-mastering-system-design-from-bas.png)
+
