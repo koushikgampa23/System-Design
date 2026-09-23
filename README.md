@@ -2696,5 +2696,33 @@ This Repo contains system design
         Firewalls, reverse proxies, Rate limiting
         Network segmentation, Zero trust
         Cloud and microservices : IAM, Encryption and API Gateway
-    
 
+## The system design Blue print
+    what is a system design?
+        Buliding scalable, maintainable systems
+        Balancing tradeoffs between performance, cost and complexity
+        The importance of clear architecture and thoughtful planning
+    Explanation:
+        A common mistake is focusing only on the intermediate solution.
+        A design that works for 1,000 users may fail completely at 1 million users.
+        That is why architects think way beyond todays requirements and consider future growth, operational challenges and long term maintainability from the start
+        Clear architecure plays a important role, It provides blueprint for how components interact, where responsibilites belong and how the system can evolve over time.
+        When architecture is poorly designed complexity grows faster than business itself.
+### The 4 step system design Approach: From problem statement to final solution
+    Step1: Understanding the problem and Defining the scope
+        Functional requirements: Define the core features(eg: URL shortening, redirection)
+        Non-Functional Requirements: Consider performance, scalability, reliability, security
+        Constraints: Account for time, budget, regularity, and technical limitations
+    Step2: Estimating scale and identifing bottlenecks
+        Estimating traffic: Analyze peak load, traffic patterns, and user growth
+        Identifying bottlenecks: Pinpoint critical components(eg: databases, CPU, network) that may face performance issues as traffic increases
+    Step3: High-level Design: Services, APIs and Communication
+        Core services: Beak down the system into essential services(eg: url shortener, analyses)
+        API Design: Define public facing endpoints(eg: Post/shorten, GET/redirect)
+        Commuication patterns: Choose Syncronous vs asycncronous(eg: REST APIs, Websockets)
+        Service Interaction: Define how services communicate(eg: via APIs, message queues)
+    Step4: Making tech and infra decisions Strategically
+        Tech stack decisions: Choose between SQL/NOSQL, data stores and caching solutions(Redis)
+        Scalability and Availibility: Implement load balancing, autoscaling and replicaiton
+        Performance Considerations: Focus on latency, throughput, and caching hot data
+        Tradeoffs: Weight vs performance, simplicity vs complexicity in tech choices(eg: Redis for caching vs traditional databases)
