@@ -2600,4 +2600,101 @@ This Repo contains system design
     Role of certificate Authorities(CAs)
     Digitial signatures and certificate chains
 
-    PKI are digital signatures, which bind public key to the identity of a website or organization or individual.But anyone can create a certificate, so how do clients know it is legitimate 
+    PKI are digital signatures, which bind public key to the identity of a website or organization or individual.But anyone can create a certificate, so how do clients know it is legitimate
+
+    That is the role of CA(certifining authority), A trusted CA can verifies the owners identity and digitally signs certificate, allowing browsers and operating systems to trust it.
+    when you connect to HTTPS website, your browser validates certificate by checking its digital signature, confirming that it is not been expired, or revoked and verifiying its certificate chain.
+    That chain starts with the website certificate, passes through one or more intermediate certificates, and ultimately leads to the trusted root certificate already installed in you browser.
+    if every link in the chain is valid, the servers identity is trust worthy.
+
+    PKIs also enables digital signatures, a sender signs data using a private key, and anyone with the corresponding public key can verify both senders identity and that the data is not been modified.
+    PKIs not only underpins HTTPS, It also secures emails, code signing, software update and many other critical systems
+
+#### Secure API Communication
+    Use HTTPS for all API traffic
+    Auth tokens(JWT, OAUTH)
+    Rate limiting, IP whitelisting, mutual TLS for sensitive apis
+#### Summary
+    Encrypt data both at rest and in transit
+    Use hasing + salt for passwords
+    Leverage TLS, PKI, HTTPS for secure communication
+    Harden APIS with secure design patterns
+
+### Network and infrastructure security
+    Firewalls and Reverse proxies
+        Firewalls: filters traffic based on ip port, protocal
+        Types: Network based, Host based, Cloud firewalls
+        Revers Proxies: route, mask backend identity, add security
+        Example: Ngnix, AWS ALB
+    Rate limiting, Throttling and IP filtering
+        Rate limiting: per-user, per-ip request caps
+        Throttling: graceful degradation under load
+        Ip filtering: allow/block lists
+        Helps protects APIs and backend systems from abuse
+    Network segmentation and isolation
+        Split network into zones: DMZ, internal, DB, etc
+        Limit lateral movement
+        Use firewalls, subnets, private VLANs
+        Cloud: use VPCs, security groups, NACLs
+    
+    Explanation:
+        Instead of placing every server and application on a single flat network, we divide the infra into isolated zones. Public facing services typically reside in a DMZ(Demilitarized zones), business applicaiton ina internal network, and sensitive databases in their own protected segment
+        The biggest advantage is limiting the lateral movement
+        If an attacker compromises a webserver, they should not be able to directly access your applicaiton or database.
+        Every hop between network segments requires passing through additional security controls and there by making attacks significantly harder.
+        Segmenation is enforced using technologies like firewalls, subnets and private VLANs
+
+        In cloud environments, the same principles applies using VPCs, virtual private clouds, and security groups and network ACLS to isolate workloads and define least privileged network access.
+
+    Zero trust security model
+        Never trust always verify
+        Auth every request, even inside the network
+        Microservices: mutual TLS, strict access control
+        Applies to cloud, hybrid and onprem setups
+    Securing cloud environments
+        Shared responsibity model
+        Key aspects:
+            IAM
+            Encryption(EBS, S3, RDS)
+            Audit logging(CloudTrail, Stack driver)
+        CSPM(Cloud security Posture Management) tools
+    Securing serverless and containerized workloads
+        Serverless: Control IAM roles, timeouts, API gateway access
+        Containers: Image scanning, runtime, hardening, least privilege
+        Tools: AWS Lambda + API gateway, Docker + Kubernetes security tools
+    Securing microservices:
+        Service to service auth(JWT, mTls)
+        Api gateway security: Validation, auth, rate limits
+        Service mesh: fine grained control, TLS, polices(Istio, Linkerd)
+    Explnation:
+        A service mesh like Istio or Linkerd addresses this by providing a dedicated infrastructure layer for secure service to service communication
+        It can automatically apply mutual TLS, enforce fine grained access polices, and apply consistent security controls across the entire microservice ecosystem
+        The architecure is simple, the security should not be embeded differently in every service, it should be standardized and enforced consistantly across the platform, making the system both more secure and easier to operate
+    Common Vulnerabilites(OWASP Top 10)
+        Injection  - expoit untrusted input
+        Broken Auth - Impersonate users
+        Sensitive Data exposure - inaduqute of protection of confidential data
+        Security Misconfig - leave system vulnerable because they deployed insecurely
+        XSS, CSRF, SSRF, etc - Target different parts of stack, but all stem from insufficient validation, trust or access control
+#### Summary
+    Use firewalls and segment your network
+    Apply rate limiting, Ip filters, reverse proxies
+    Embrace Zero trust and encrypt everywhere
+    Secure APIs, services, containers and functions
+    Stay alert to OWASP Top 10
+### Section summary
+    Security in distributed systems
+        CIA Triad: Confidentiality, Integrity, Availabilty
+        Common Threats: DDos, MITM, Injection, Spoofing
+    Authentication and authorization
+        Auth methods: OAuth2, openid, JWT
+        Access Control: RBAC, ABAC, SSO
+    Data protection and secure communication
+        Eccryption at rest and in transit
+        TLS/SSL, HTTPS, HASING, Salting
+    Network and infrastructure Security
+        Firewalls, reverse proxies, Rate limiting
+        Network segmentation, Zero trust
+        Cloud and microservices : IAM, Encryption and API Gateway
+    
+
