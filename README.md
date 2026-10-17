@@ -2733,6 +2733,39 @@ This Repo contains system design
     Make informed infrastructure and tech choices to ensure scalability and availibility
     ![alt text](tcsglobal.udemy.com-course-mastering-system-design-from-bas.png)
 
+## Interview questions
+### Why do we use atomic transcation in django?
+    It ensures that database operations inside the block are treated as a single transaction.
+    - If all operations succeed, the transaction is committed.
+    - If an exception causes the transaction to roll back, the database changes made within that transaction are undone.
+    - If you catch an exception inside the block, Django might not roll back automatically, depending on how the exception is handled.
+    
+    Does it open a database connection?
+        No, not necessarily. Django typically manages database connections separately from transactions.
+        When you execute a database query, Django obtains a connection from its connection management system. That connection might already exist because Django reuses database connections.
+    
+    What if the code inside atomic() takes 10 seconds?
+        with transaction.atomic():
+        seat.status = "HELD"
+        seat.save()
+
+        time.sleep(10)
+
+        booking.status = "CONFIRMED"
+        booking.save()
+    The transaction remains active during the 10-second sleep. The database connection is occupied by that transaction, and locks acquired by the transaction may remain held until it commits or rolls back.
+
+### How do you deal with 100 million concurrent request to book particular movie ticket seat?
+    Since we are dealing with millions of requests, I would use a load balancer to distribute traffic across multiple Django application instances.
+
+    When multiple requests attempt to book the same seat concurrently, each instance performs a conditional database update to change the seat status from AVAILABLE to HELD, with a three-minute expiration time.
+
+    The database handles the concurrent updates atomically. Only one request can successfully change the seat from AVAILABLE to HELD. I would check the number of affected rows: if it is one, the reservation succeeds and the user can proceed to the payment gateway; otherwise, I return a seat-unavailable response.
+
+    After successful payment, I would change the seat status from HELD to BOOKED, provided the hold is still valid. If payment fails or the hold expires, I would release the seat safely, ensuring that I do not release a seat that has already been booked by another user.
+
+    I would commit the reservation before calling the payment gateway rather than keeping a database transaction open during payment. I would also handle payment retries and delayed responses to prevent duplicate bookings or inconsistent payment states.
+
 ## Case Studies
 ### URL shortner (Tiny URL)
     Turn long weburls into short
@@ -2835,4 +2868,52 @@ This Repo contains system design
 
     Final design of url shortner:
     ![alt text](<Final design for url shortner.png>)
+
+### Design a ticketing system(Book My Show)
+    A ticketing system is an online platform that allows users to browse, book and manage tickets.
+    It must handle realtime seat availibity, secure transcations and high concurrency
+
+    Step1:
+    Functional Requirements(Core capabilities app must provide):
+        User functions:
+            Browse events and view available seats
+            Book/reserve tickets
+            Get real-time seat availibility
+            Pay for tickets securly
+            Receive sms/email confirmations
+        Admin functions:
+            Create/manage events and venues
+            Define seat layout and pricing
+    Non functional requirements:
+        High availibility - No down time during peak hours
+        Low latency - Booking response in milliseconds
+        Scalability - Handle flash sales and global traffic
+        Data consistance - Avoid double booking of same seat
+        Audit logs - For tracking transcations and fraud prevention
+    
+    Step2:
+    Estimating scale and Identifiying bottlenecks
+        User load assumptions
+            1 million Daily Active users(DAC)
+            100k concurrent users during peak events
+            ~10 events browsed per user/day
+            10 million read request/day
+        Booking traffic assumptions
+            500k bookings per day
+            Average: 6 Bookings/sec
+            Peak: upto 2000 bookings/sec (Big concert)
+    Identifing system Bottlenecks:
+        Concurrency in seat allocation - Race condition when multiple users book same seat
+        Database with pressure - Booking spikes can overwhelm the write database
+        Payment and External API latency-Third party delays or failures can block seat availibty
+        Notifications Blockages - Email/sms can queue up during peak traffic
+    Step3:
+    High level system design for services, api and communication
+    Major components:
+        Frontend clients - web/mobile app
+        Api Gateway -  A unified entry point for authentication and routing
+        Authentication service - handles user authentication and authorization
+        Admin Panel - Event creation, venue setup, pricing
+        
+
 
