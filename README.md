@@ -2733,3 +2733,106 @@ This Repo contains system design
     Make informed infrastructure and tech choices to ensure scalability and availibility
     ![alt text](tcsglobal.udemy.com-course-mastering-system-design-from-bas.png)
 
+## Case Studies
+### URL shortner (Tiny URL)
+    Turn long weburls into short
+    Step1:
+    Functional requirement:
+        -> Shorten a url - Accept a valid long url and return a shortend url
+        -> Redirect a long url - when accessing the short url, redirect to the original long url
+        -> Prevent duplicate short urls - If the same long url is submitted, return the same short url or handle according to configuration
+        -> User authentication -Allow users to register/login to manage urls, view analytics and expiration
+    Non functional requirements(Dont introduce new features but ensures quality of product):
+        -> High availability - System must be available 24/7 with 99.9% uptime
+        -> Performance and low latency - Url redirection should occur in milliseconds. Shortening urls should be near instaneous
+        -> Scalability - System must handle millions of urls, supporting high read volumes(redirects) and moderate write volumes(URL shortening)
+        -> Reliability - Ensure data persistance and no data loss even during failures using durable storage and backups
+    
+    Url shortening strategies
+        Random strings -> collions might occur
+        UUID -> unique but give a long string not ideal
+        Hash + salt -> colisions might occur ideal for security systems
+        Base62 Encoding -> Ideal produces short, compact and deterministic urls, extremely fast
+
+    Step2:
+    Estimating scale and bottlenecks
+        Estimated user traffic(Rough)
+            Daily active users(DAU): ~10 million
+            Montly active users(MAU): ~300 million
+            New short urls/day: ~1,00,000 (1% of DAU)
+            Redirect requests/day: ~50 million(5 per user)
+        Memory Requirement(Hot URL Cache)
+            Cache top 1m most accessed urls
+            Each mapping = 500 bytes
+            Total memory = 500mb
+        Network Bandwidth(Redirects)
+            50M redirects/day * 700 bytes = 35 gb/day
+            Average throughput: ~0.4mb/sec
+            Peak throughput: ~5mb/sec
+        Storage Requirement(URL Mapping DB):
+            100k new urls/day * 500 bytes = 50 mb/day
+            Yearly data = 18 GB raw + overhead
+            Plan for 50 GB/year with indexes, logs and backups
+    Bottleneck identification
+        High Read volumes: Priotize caching and fast database reads
+        Moderate Write throughput: Maintain consistance across writes
+        Redirect latency matters: Use low latency infra
+        Traffic bursts happen: Prepare autoscaling and CDN support 
+    
+    Step3:
+    API Design - Create a short url
+    Accepts a long url and returns a shortend url
+
+    Post /api/shorten
+    Request:
+    {
+        "long_url": "https://example.longurl.com/"
+    }
+    Response:
+    {
+        "short_url": "https://tinyurl.com/alias"
+    }
+
+    Get /:shortkey(eg: /abc)
+    Requst -> Tiny url lookup -> Redirect to original url(Return HTTP 302 redirect to long URL)
+
+    DELETE
+    An optional operation to delete a TinyURL short link mapping
+    Authenticated user -> Delete /api/:short_key -> Verify ownership -> mapping deleted
+
+    User authentication APIS
+    Registration
+    POST /api/auth/register
+    Request
+    {
+        "name": test,
+        "gmail":gmail,
+        "password": password
+    }
+    Response
+    {
+        "message": registration sucessfull
+    }
+
+    Login
+    POST /api/auth/login
+    Request:
+    {
+        email: email,
+        password: password
+    }
+    Response:
+    {
+        access_token: afafsd,
+        refresh_token: ssfsd
+    }
+
+    Step4:
+    High Level System design
+    ![alt text](<hld of tiny url.png>)
+    ![alt text](<zookeeper for tiny url.png>)
+    ![alt text](<strategy tech and infra for tiny url.png>)
+
+    Final design of url shortner:
+    ![alt text](<Final design for url shortner.png>)
+
