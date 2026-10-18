@@ -2862,12 +2862,12 @@ This Repo contains system design
 
     Step4:
     High Level System design
-    ![alt text](<hld of tiny url.png>)
-    ![alt text](<zookeeper for tiny url.png>)
-    ![alt text](<strategy tech and infra for tiny url.png>)
+    ![alt text](<tiny_url_hld/hld of tiny url.png>)
+    ![alt text](<tiny_url_hld/zookeeper for tiny url.png>)
+    ![alt text](<tiny_url_hld/strategy tech and infra for tiny url.png>)
 
     Final design of url shortner:
-    ![alt text](<Final design for url shortner.png>)
+    ![alt text](<tiny_url_hld/Final design for url shortner.png>)
 
 ### Design a ticketing system(Book My Show)
     A ticketing system is an online platform that allows users to browse, book and manage tickets.
@@ -2916,7 +2916,7 @@ This Repo contains system design
         Authentication service - handles user authentication and authorization
         Admin Panel - Event creation, venue setup, pricing
         Backend Services:
-       ![alt text](<backend services of ticket booking hld.png>) 
+       ![alt text](<ticket booking hld/backend services of ticket booking hld.png>) 
         Data and caching architecture:
             Relational Db(postgresql/mysql) - For transcations, bookings, users
             No sql db(Mongodb/dynamodb) - For events and seat layouts
@@ -2951,9 +2951,9 @@ This Repo contains system design
 
     Step4:
     Strategic Tech and infra decisions:
-    ![alt text](<ticket booking hld design.png>)
+    ![alt text](<ticket booking hld/tech and infra decisions.png>)
 
     Final Design of end-to-end flow:
-    ![alt text](<final design for ticket booking hld.png>)
+    ![alt text](<ticket booking hld/final design for ticket booking hld.png>)
 
 
