@@ -2916,7 +2916,7 @@ This Repo contains system design
         Authentication service - handles user authentication and authorization
         Admin Panel - Event creation, venue setup, pricing
         Backend Services:
-       ![alt text](<ticket_booking_hld/backend services of ticket booking hld.png>) 
+![alt text](<ticket_booking_hld/backend services of ticket booking hld.png>) 
         Data and caching architecture:
             Relational Db(postgresql/mysql) - For transcations, bookings, users
             No sql db(Mongodb/dynamodb) - For events and seat layouts
@@ -2951,9 +2951,9 @@ This Repo contains system design
 
     Step4:
     Strategic Tech and infra decisions:
-    ![alt text](<ticket_booking_hld/tech and infra decisions.png>)
+![alt text](<ticket_booking_hld/tech and infra decisions.png>)
 
     Final Design of end-to-end flow:
-    ![alt text](<ticket_booking_hld/final design for ticket booking hld.png>)
+![alt text](<ticket_booking_hld/final design for ticket booking hld.png>)
 
 
