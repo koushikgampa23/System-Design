@@ -2907,6 +2907,7 @@ This Repo contains system design
         Database with pressure - Booking spikes can overwhelm the write database
         Payment and External API latency-Third party delays or failures can block seat availibty
         Notifications Blockages - Email/sms can queue up during peak traffic
+    
     Step3:
     High level system design for services, api and communication
     Major components:
@@ -2914,6 +2915,45 @@ This Repo contains system design
         Api Gateway -  A unified entry point for authentication and routing
         Authentication service - handles user authentication and authorization
         Admin Panel - Event creation, venue setup, pricing
-        
+        Backend Services:
+       ![alt text](<backend services of ticket booking hld.png>) 
+        Data and caching architecture:
+            Relational Db(postgresql/mysql) - For transcations, bookings, users
+            No sql db(Mongodb/dynamodb) - For events and seat layouts
+            Caching layer(Redis/memcached) - Real time seat availability
+            Queue System(kafka/Rabbitmq) - Async handling for: Emails, Payment retries, Audit logs 
+    
+    Notable design Decisions:
+        1.Concurrency control
+            Use optimistic locking (version checks) or pessimistic seal-level locking
+            Optimistic locking - checks another user modified the seat from available to held
+            Pessimistic locking - Locks the seat for that particular user over a period of time
+        2.Seat hold Timeout:
+            Redis-backend TTL lock automatically releases seats for 5 minutes
+        3.CQRS pattern
+            Split reads(seat availbility, listing) from writes(bookings).
+        4.Payment idempotency
+            Idempotency keys prevent duplicate charges and enables safe retries
+    
+    API Design - Key Endpoints
+    Event management service
+                                            Request                             Response
+    POST - /events -> create new event -> name, description, date, location -> 201 (event id)
+    Get - /events -> Get all events    -> filter, sort, page, pageSize      -> 200
+                    support filtering, sort, pagination via query param
+    GET - /events/{event_id} -> Get event details -> Path param             -> 200 ok 404 not found
+
+    Booking service
+    POST - /bookings -> Create new booking -> eventid, userid, numberoftickets -> 201, 400 badrequest(no tickets)
+    Get - /bookings -> Get all bookings(support filter by user or event via query param) -> userid, eventid, page, pageSize -> 200 (array of bookings)
+    Get - /bookings/{booking_id} -> Get booking details -> Path param -> 200 ok, 404 Not found
+                                    Get details of specific booking
+
+    Step4:
+    Strategic Tech and infra decisions:
+    ![alt text](<ticket booking hld design.png>)
+
+    Final Design of end-to-end flow:
+    ![alt text](<final design for ticket booking hld.png>)
 
 
