@@ -3070,7 +3070,7 @@ This Repo contains system design
     Stragetic Tech and infra decisions
 ![alt text](<news_feed_instagram_or_twitter/r2 strategic tech and infra.png>)
     Final decision - new feed
-![alt text](<r3 final decision design.png>)
+![alt text](<news_feed_instagram_or_twitter/r3 final decision design.png>)
 
 
 
