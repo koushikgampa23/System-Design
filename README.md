@@ -2957,3 +2957,121 @@ This Repo contains system design
 ![alt text](<ticket_booking_hld/final design for ticket booking hld.png>)
 
 
+### Design a News feed(Instagram/Twitter)
+    Step1:
+    Core functional requirements:
+        Post a twitter/update
+        Follow/unfollow user
+        view home timeline
+        Timeline must show updates from followed users
+        Likes, replies and retwittes
+        Media uploads(images,videos)
+        Intraction flow
+            Alice follows bob
+            bob twittes hello world
+            Alice opens app and sees bob's tweet instantly
+    Non functional requirement:
+        Timeline expections
+        Feeds loads instantly
+        New posts appear in real time
+        Feed is relevant and fresh
+        Posts are not missing or duplicated
+
+        Low latency(Feeds load instantly), High availibility, Scalability, Instant feed load, Real time load, Real time update, Fresh and relevent(Feed is fresh and relevant), No missing/duplicate Posts(posts are not missing or duplicates)
+    
+    Constraints and challenges
+    Fan-in or fan-out Challenge
+        1 user -> 1 tweet -> must reach 1m followers
+        Should we push to all followers? or pull on demand?
+    Fan out on writes - Fast reads, heavy writes
+    Fan out on Read - Slow reads, Light writes
+
+    Step2:
+    Estimating scale and identifying bottlenecks
+    Daily load Estimates
+        500M total users | 200M DAU
+        ~1B tweets/Day | 300M media uploads
+        ~1B likes, 500M replies, 250M retweets
+        2B+ feed requests/day(10 opens/user)
+        Read > write, ~80% traffic is read heavy
+    Media Storage and delivery
+        ~300M media uploads/day = 100-500 TB/day
+        uploads API, Object storage(S3, GCS), CDN-backend delivery, Tweet <-> media linking
+    
+    Identifying system bottlenecks and challenges
+    Fan out write vs fan out reads
+        Fan out write
+            Tweet is written to all followers timeline in advance
+            Fast reads(timeline already ready)
+            Heavy writes(needs to write to many timelines)
+        Fan out reads
+            Build timeline when user requests it(fetch from followed users)
+            Slower reads(need to aggreate and sort)
+            Lighter writes(only store once)
+    Hot users(celebrites) can trigger write storms
+        A single post from celebrity can generate millions of writes across follower timelines
+    Read and write Amplification(A single user action can result in multiple writes and updates)
+        Write intensive actions
+            Posting a tweet may fan out to 100s of millions of timelines
+            Retwittes, replies, likes update multiple engagement counters and visibility
+            Media uploads cause chunked writes, storage, and metadata updates
+        Engagement Updates
+            Retwittes, replies, likes update multiple counters
+            Affects ranking and visibility across timelines
+            Triggers notifications and other downstream processing
+        Media uploads
+            Chucked writes for large files
+            Stored in object storage
+            Metadata updates(thumbnails, formats, etc)
+    Read-heavy patterns(Reading timelines involves multiple backend operations)
+        Opening the timeline - Aggregates and sorts twittes from 100s of followed users
+        Viewing a tweet - Fetches media, replies, likes, retwittes, and related data
+        Scrolling - Triggers pagination, cache lookups and lazy loading
+    One user action can trigger multiple backend reads and writes across services
+
+    Step3:
+    High level design of news feed
+        Core services Breakdown:
+            User service - Profile, follow/unfollow
+            Tweet service - Create, Retrive tweets
+            Timeline service - Compose timelines for users
+            Engagement service - Likes, replies, retweets
+            Media service - Upload, store, fetch media
+            Notification service - Fan-out alerts, activity
+            Fanout Worker - Background timeline propagation
+    High level architecute - Zoomed out 
+![alt text](<news_feed_instagram_or_twitter/r1 high level architecture zoomed out.png>)
+
+    API design - sample API contracts
+        POST - /tweet - create a tweet
+        GET - /timeline - Return latest tweets for a user
+        POST - /follow POST - /unfollow - Modify following relationships
+        POST - /likes, /retweets, /reply
+        Post - /media/upload - upload media and return CDN url
+
+    Timeline generation strategy
+        Fanout writes
+            Precompute timelines when a user tweets
+            Fast reads, heavy write for hot users
+        Fanout reads
+            Compose timeline on demand from followed users
+            Lighter reads, slower reads
+        Hybrid Model
+            Fanout writes to regular users
+            Fanout reades for hot users
+    Sync vs Async Communication
+        Syncronous (API calls)
+            Client waits for a response. Used for realtime user facing operations
+            Client -> Fetch user timeline/get tweet details -> Timeline api service
+        Asyncronous (Event queues)
+            Client sends a message and continous, Processing happens in background
+            New tweet -> New tweet, media upload, engagement -> Event queue -> Fanout service, Media processing, Notificaiton service
+
+    Stragetic Tech and infra decisions
+![alt text](<news_feed_instagram_or_twitter/r2 strategic tech and infra.png>)
+    Final decision - new feed
+![alt text](<r3 final decision design.png>)
+
+
+
+
